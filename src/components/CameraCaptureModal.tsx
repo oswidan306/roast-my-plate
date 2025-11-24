@@ -213,7 +213,7 @@ export function CameraCaptureModal({
             className="camera-modal__button camera-modal__button--secondary"
             onClick={handleChooseFile}
           >
-            Choose File
+            Select Photo
           </button>
           <button
             type="button"

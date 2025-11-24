@@ -98,7 +98,6 @@ export function CirclePlateUpload({
         ref={inputRef}
         type="file"
         accept={ACCEPTED_TYPES.join(',')}
-        capture="environment"
         className="plate-upload__input"
         onChange={handleChange}
       />
