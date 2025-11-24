@@ -514,7 +514,6 @@ img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scaleX(-1); /* Mirror for natural preview feel */
 }
 
 .camera-modal__canvas {
