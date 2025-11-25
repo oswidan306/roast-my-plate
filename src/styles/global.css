@@ -685,21 +685,61 @@ img {
 }
 
 .result-screen__logo {
-  width: 80px;
-  height: 80px;
+  width: 200px;
+  height: 200px;
   margin-top: 2rem;
   margin-bottom: auto;
   object-fit: contain;
 }
 
+.result-screen__save-button,
+.result-screen__replace-button {
+  position: absolute;
+  top: 2rem;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 150ms ease, transform 150ms ease;
+  z-index: 10;
+}
+
+.result-screen__save-button {
+  left: 1.5rem;
+}
+
+.result-screen__replace-button {
+  right: 1.5rem;
+}
+
+.result-screen__save-button:hover,
+.result-screen__replace-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.result-screen__save-button:active,
+.result-screen__replace-button:active {
+  transform: scale(0.95);
+}
+
 .result-screen__plate {
   width: min(420px, 85vw);
+  height: min(420px, 85vw); /* Force equal width and height for perfect circle */
   aspect-ratio: 1;
   border-radius: 50%;
   overflow: hidden;
   margin-top: calc(50vh - 210px - 4rem); /* Position halfway down, accounting for logo */
   margin-bottom: 1.5rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  position: relative;
 }
 
 .result-screen__plate img {
@@ -707,6 +747,7 @@ img {
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
+  display: block;
 }
 
 .result-screen__roast {

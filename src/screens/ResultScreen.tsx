@@ -10,6 +10,8 @@ const CHEF_BACKGROUNDS = [
   '/assets/chef-3.png',
 ]
 
+const CHEF_INDEX_KEY = 'roast-my-plate-chef-index'
+
 export function ResultScreen() {
   const navigate = useNavigate()
   const { platePreview, roastText, phase } = useRoastSession()
@@ -31,9 +33,147 @@ export function ResultScreen() {
       return
     }
 
-    // Randomly select a chef background
-    setSelectedChef(Math.floor(Math.random() * CHEF_BACKGROUNDS.length))
+    // Cycle through chef backgrounds
+    const currentIndex = parseInt(localStorage.getItem(CHEF_INDEX_KEY) || '0', 10)
+    const nextIndex = (currentIndex + 1) % CHEF_BACKGROUNDS.length
+    localStorage.setItem(CHEF_INDEX_KEY, nextIndex.toString())
+    setSelectedChef(nextIndex)
   }, [platePreview, phase, navigate])
+
+  const handleSave = async () => {
+    if (!containerRef.current || !platePreview) return
+
+    try {
+      // Create a canvas to capture the image (without buttons)
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+
+      // Set canvas size to match viewport
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+
+      // Get the background image
+      const bgImg = new Image()
+      bgImg.crossOrigin = 'anonymous'
+      bgImg.src = CHEF_BACKGROUNDS[selectedChef]
+
+      await new Promise((resolve, reject) => {
+        bgImg.onload = resolve
+        bgImg.onerror = reject
+      })
+
+      // Draw background
+      ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height)
+
+      // Draw dark scrim (darker towards bottom)
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
+      gradient.addColorStop(0, 'rgba(0, 0, 0, 0.2)')
+      gradient.addColorStop(0.5, 'rgba(0, 0, 0, 0.4)')
+      gradient.addColorStop(1, 'rgba(0, 0, 0, 0.7)')
+      ctx.fillStyle = gradient
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+      // Draw logo at top
+      try {
+        const logoImg = new Image()
+        logoImg.crossOrigin = 'anonymous'
+        logoImg.src = '/assets/RMP-logo.svg'
+        await new Promise((resolve, reject) => {
+          logoImg.onload = resolve
+          logoImg.onerror = () => {
+            const img = new Image()
+            img.crossOrigin = 'anonymous'
+            img.src = '/assets/RMP-logo.svg'
+            img.onload = resolve
+            img.onerror = reject
+          }
+        })
+        const logoSize = 200
+        const logoX = canvas.width / 2 - logoSize / 2
+        const logoY = 40
+        ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize)
+      } catch (err) {
+        console.warn('Could not load logo:', err)
+      }
+
+      // Draw plate image
+      const plateImg = new Image()
+      plateImg.crossOrigin = 'anonymous'
+      plateImg.src = platePreview
+      await new Promise((resolve, reject) => {
+        plateImg.onload = resolve
+        plateImg.onerror = reject
+      })
+
+      const plateSize = Math.min(420, canvas.width * 0.7)
+      const plateX = canvas.width / 2 - plateSize / 2
+      const plateY = canvas.height * 0.4
+
+      // Create circular clipping for plate
+      ctx.save()
+      ctx.beginPath()
+      ctx.arc(plateX + plateSize / 2, plateY + plateSize / 2, plateSize / 2, 0, Math.PI * 2)
+      ctx.clip()
+      ctx.drawImage(plateImg, plateX, plateY, plateSize, plateSize)
+      ctx.restore()
+
+      // Draw roast text with word wrapping
+      ctx.fillStyle = '#fff'
+      ctx.font = '400 24px "PP Editorial New", serif'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'top'
+      const textX = canvas.width / 2
+      const textY = plateY + plateSize + 30
+      const maxWidth = canvas.width - 80
+      const lineHeight = 32
+      const words = safeRoast.split(' ')
+      let line = ''
+      let y = textY
+
+      // Add text shadow effect
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'
+      ctx.shadowBlur = 4
+      ctx.shadowOffsetX = 0
+      ctx.shadowOffsetY = 2
+
+      for (let i = 0; i < words.length; i++) {
+        const testLine = line + words[i] + ' '
+        const metrics = ctx.measureText(testLine)
+        if (metrics.width > maxWidth && i > 0) {
+          ctx.fillText(line.trim(), textX, y)
+          line = words[i] + ' '
+          y += lineHeight
+        } else {
+          line = testLine
+        }
+      }
+      if (line.trim()) {
+        ctx.fillText(line.trim(), textX, y)
+      }
+
+      // Convert to blob and download
+      canvas.toBlob((blob) => {
+        if (!blob) return
+
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = 'roast-my-plate.jpg'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+      }, 'image/jpeg', 0.9)
+    } catch (error) {
+      console.error('Error creating save image:', error)
+      alert('Unable to save image. Please try again.')
+    }
+  }
+
+  const handleReplacePlate = () => {
+    navigate('/upload')
+  }
 
   const handleShareToStory = async () => {
     if (!containerRef.current || !platePreview) return
@@ -85,7 +225,7 @@ export function ResultScreen() {
             img.onerror = reject
           }
         })
-        const logoSize = 80
+        const logoSize = 200
         const logoX = canvas.width / 2 - logoSize / 2
         const logoY = 40
         ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize)
@@ -200,6 +340,28 @@ export function ResultScreen() {
       >
         <div className="result-screen__scrim" />
         <div className="result-screen__content" ref={containerRef}>
+          {/* Top left save button */}
+          <button
+            className="result-screen__save-button"
+            onClick={handleSave}
+            aria-label="Save image"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 12v7H5v-7M12 3v12M7 8l5-5 5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          
+          {/* Top right replace button */}
+          <button
+            className="result-screen__replace-button"
+            onClick={handleReplacePlate}
+            aria-label="Replace plate"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+
           <img
             src="/assets/RMP-logo.svg"
             alt="Roast My Plate"
