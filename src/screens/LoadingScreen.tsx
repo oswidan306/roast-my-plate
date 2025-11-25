@@ -54,7 +54,8 @@ export function LoadingScreen() {
         <source src="/assets/loading.mp4" type="video/mp4" />
       </video>
       <div className="loading-screen">
-        <p className="loading-screen__text">CHEF IS INSPECTING</p>
+        <div className="loading-screen__scrim" />
+        <p className="loading-screen__text">LET'S SEE WHAT WE GOT HERE</p>
         {platePreview && (
           <div className="loading-screen__plate">
             <img src={platePreview} alt="Uploaded plate" />
