@@ -389,6 +389,13 @@ img {
   text-align: center;
   z-index: 1;
   transition: transform 0.5s ease-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem; /* Space between title and chef review */
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem; /* Space between title and chef review */
 }
 
 .upload-screen__header--slide-up {
@@ -544,18 +551,18 @@ img {
 }
 
 .loading-screen__scrim {
-  position: absolute;
+  position: fixed; /* Use fixed to cover entire viewport */
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.6); /* Much darker scrim */
-  z-index: 0;
+  z-index: 1; /* Above video but below content */
 }
 
 .loading-screen__text {
   font-family: 'PP Editorial New', serif;
-  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-size: 3.5rem; /* 56px */
   font-weight: 200;
   color: #fff;
   text-align: center;
@@ -566,7 +573,7 @@ img {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   position: relative;
-  z-index: 2;
+  z-index: 2; /* Above scrim */
 }
 
 .loading-screen__plate {
@@ -658,7 +665,7 @@ img {
 }
 
 .result-screen__scrim {
-  position: absolute;
+  position: fixed; /* Use fixed to cover entire viewport */
   top: 0;
   left: 0;
   right: 0;
@@ -680,9 +687,9 @@ img {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem 1.5rem;
+  padding: 0 1.5rem 2rem 1.5rem; /* Remove top padding, keep bottom and sides */
   text-align: center;
-  overflow: visible; /* Allow logo to extend beyond padding */
+  overflow: visible;
 }
 
 .result-screen__logo {
@@ -692,7 +699,7 @@ img {
   margin-bottom: auto;
   object-fit: contain;
   position: absolute;
-  top: -2.5rem; /* Move much higher, above the content padding */
+  top: 1rem; /* Adjust from -6rem to 1rem to align with buttons */
   left: 50%;
   transform: translateX(-50%);
   z-index: 3;
@@ -701,7 +708,7 @@ img {
 .result-screen__save-button,
 .result-screen__replace-button {
   position: absolute;
-  top: 2rem;
+  top: 1rem; /* Adjust from 2rem to 1rem since no padding */
   width: 48px;
   height: 48px;
   border: none;

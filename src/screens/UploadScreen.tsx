@@ -27,6 +27,7 @@ export function UploadScreen() {
             <span className="upload-screen__header-word--submit">SUBMIT</span>{' '}
             <span className="upload-screen__header-word--dish">DISH</span>
           </p>
+          <p className="upload-screen__chef-review">** FOR CHEF'S REVIEW **</p>
         </div>
         <div className="upload-screen__plate">
           <CirclePlateUpload
@@ -34,7 +35,6 @@ export function UploadScreen() {
             onFileSelect={(file, preview) => selectPlate(file, preview)}
             onCameraStateChange={setIsCameraOpen}
           />
-          <p className="upload-screen__chef-review">** FOR CHEF'S REVIEW **</p>
         </div>
         {platePreview && !isCameraOpen && (
           <div className={`upload-screen__footer ${isAnimating ? 'upload-screen__footer--slide-down' : ''}`}>
