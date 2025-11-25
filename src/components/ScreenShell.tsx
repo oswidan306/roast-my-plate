@@ -3,7 +3,7 @@ import clsx from 'clsx'
 
 interface ScreenShellProps {
   id?: string
-  background?: 'splash' | 'upload' | 'loading' | 'table' | 'dark' | 'canvas'
+  background?: 'splash' | 'upload' | 'loading' | 'result' | 'table' | 'dark' | 'canvas'
   children: ReactNode
   padded?: boolean
 }
@@ -15,6 +15,7 @@ const backgroundClass: Record<
   splash: 'screen-shell--splash',
   upload: 'screen-shell--upload',
   loading: 'screen-shell--loading',
+  result: 'screen-shell--result',
   table: 'screen-shell--table',
   dark: 'screen-shell--dark',
   canvas: 'screen-shell--canvas',

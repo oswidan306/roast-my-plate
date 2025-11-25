@@ -26,7 +26,7 @@ export function LoadingScreen() {
           'That turkey looks drier than my inbox after Thanksgiving. The cranberry splat? Avant-garde ketchup.',
         )
         navigate('/result', { replace: true })
-      }, 10000) // Increased to 10 seconds to let video play
+      }, 4500) // 4.5 seconds - reduced from 10 seconds
       return () => clearTimeout(timer)
     }
 
