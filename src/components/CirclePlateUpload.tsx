@@ -106,7 +106,7 @@ export function CirclePlateUpload({
         onClose={handleCameraClose}
         onCapture={handleCameraCapture}
         onChooseFile={handleChooseFile}
-        guideSize={360}
+        guideSize={420}
       />
     </div>
   )

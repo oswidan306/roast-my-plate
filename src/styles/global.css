@@ -1,5 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fredoka:wght@500;600&display=swap');
 
+@font-face {
+  font-family: 'PP Editorial New';
+  src: url('/fonts/PPEditorialNew-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Editorial New';
+  src: url('/fonts/PPEditorialNew-Ultralight.otf') format('opentype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   color-scheme: light dark;
   --color-bg: #fff7f0;
@@ -54,12 +70,13 @@ img {
 .screen-shell--splash {
   background-image: url('/assets/splash-2.png');
   background-size: cover;
-  background-position: center;
+  background-position: center top;
   background-repeat: no-repeat;
   position: relative;
   overflow: hidden;
   min-height: 100vh;
   height: 100vh;
+  background-color: #1a3a2e; /* Dark teal/green to match image, prevents white space */
 }
 
 .screen-shell--upload {
@@ -107,12 +124,48 @@ img {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: stretch;
-  padding: 0 1.5rem 2.5rem;
+  padding: 3rem 1.5rem 2.5rem;
   position: relative;
   z-index: 1;
   overflow: hidden;
+}
+
+.splash__title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.splash__title-word {
+  font-family: 'PP Editorial New', serif;
+  line-height: 1;
+  display: block;
+}
+
+.splash__title-word--roast {
+  font-weight: 400;
+  font-size: clamp(3rem, 12vw, 5rem);
+  color: #dc2626;
+  margin: 0;
+}
+
+.splash__title-word--my {
+  font-weight: 200;
+  font-size: clamp(1.5rem, 6vw, 2.5rem);
+  color: #fff;
+  margin: 0.25rem 0;
+}
+
+.splash__title-word--plate {
+  font-weight: 400;
+  font-size: clamp(3rem, 12vw, 5rem);
+  color: #dc2626;
+  margin: 0;
 }
 
 .splash__begin-button {
@@ -124,8 +177,8 @@ img {
   border: none;
   border-radius: 8px;
   font-size: 1.25rem;
-  font-weight: 700;
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-weight: 400;
+  font-family: 'PP Editorial New', serif;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
@@ -192,8 +245,8 @@ img {
 }
 
 .plate-upload__surface {
-  width: min(360px, 75vw);
-  height: min(360px, 75vw);
+  width: min(420px, 85vw);
+  height: min(420px, 85vw);
   border-radius: 50%;
   border: none;
   background: transparent;
@@ -297,25 +350,52 @@ img {
 
 .upload-screen__header-text {
   margin: 0;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(1.5rem, 5vw, 2rem);
-  font-weight: 700;
-  color: #fff;
+  font-family: 'PP Editorial New', serif;
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  line-height: 1.2;
+  line-height: 1.1;
+}
+
+.upload-screen__header-word--submit {
+  color: #fff;
+}
+
+.upload-screen__header-word--dish {
+  color: #dc2626;
 }
 
 .upload-screen__subheader-text {
-  margin: 0.5rem 0 0;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(0.875rem, 3vw, 1.125rem);
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
+  margin: 0.75rem 0 0;
+  font-family: 'PP Editorial New', serif;
+  font-size: clamp(0.875rem, 3vw, 1.25rem);
+  font-weight: 200;
+  color: rgba(255, 255, 255, 0.95);
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.1em;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.upload-screen__subheader-text::before,
+.upload-screen__subheader-text::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.upload-screen__subheader-text::before {
+  top: -0.5rem;
+}
+
+.upload-screen__subheader-text::after {
+  bottom: -0.5rem;
 }
 
 .upload-screen__plate {
@@ -345,9 +425,9 @@ img {
   color: #fff;
   border: none;
   border-radius: 8px;
-  font-size: 1.125rem;
-  font-weight: 700;
-  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  font-family: 'PP Editorial New', serif;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;

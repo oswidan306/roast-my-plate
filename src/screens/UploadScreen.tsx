@@ -22,8 +22,11 @@ export function UploadScreen() {
     <ScreenShell id="upload" background="upload" padded={false}>
       <div className="upload-screen">
         <div className={`upload-screen__header ${isAnimating ? 'upload-screen__header--slide-up' : ''}`}>
-          <p className="upload-screen__header-text">SUBMIT DISH</p>
-          <p className="upload-screen__subheader-text">FOR CHEF'S REVIEW</p>
+          <p className="upload-screen__header-text">
+            <span className="upload-screen__header-word--submit">SUBMIT</span>{' '}
+            <span className="upload-screen__header-word--dish">DISH</span>
+          </p>
+          <p className="upload-screen__subheader-text">FOR THE CHEF'S REVIEW</p>
         </div>
         <div className="upload-screen__plate">
           <CirclePlateUpload

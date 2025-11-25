@@ -7,6 +7,11 @@ export function SplashScreen() {
   return (
     <ScreenShell id="splash" background="splash" padded={false}>
       <div className="splash__container">
+        <div className="splash__title">
+          <span className="splash__title-word splash__title-word--roast">ROAST</span>
+          <span className="splash__title-word splash__title-word--my">MY</span>
+          <span className="splash__title-word splash__title-word--plate">PLATE</span>
+        </div>
         <button
           className="splash__begin-button"
           onClick={() => navigate('/upload')}
