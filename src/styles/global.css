@@ -438,7 +438,7 @@ img {
   align-items: center;
   justify-content: center;
   z-index: 1;
-  margin-top: 1.5rem; /* Move plate downwards */
+  margin-top: 3rem; /* Move plate further downwards */
 }
 
 .upload-screen__subheader {
