@@ -459,7 +459,7 @@ img {
   align-items: center;
   justify-content: center;
   z-index: 1;
-  margin-top: calc(5rem + 48px); /* Move plate down by additional 48px */
+  margin-top: calc(3rem + 24px); /* Reduced from 5rem + 48px to move plate higher */
   gap: 1rem;
 }
 
@@ -473,6 +473,7 @@ img {
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   margin: 0;
   text-align: center;
+  white-space: nowrap; /* Keep on one line */
 }
 
 .upload-screen__subheader {
@@ -556,7 +557,12 @@ img {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6); /* Much darker scrim */
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0.5) 50%,
+    rgba(0, 0, 0, 0.85) 100%
+  ); /* Gradient from lighter at top to very dark at bottom */
   z-index: 1; /* Above video but below content */
 }
 
