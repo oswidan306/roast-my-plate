@@ -580,7 +580,7 @@ img {
   justify-content: center;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   position: absolute;
-  bottom: 5%; /* Moved to farthest down position */
+  bottom: 8px; /* Fixed position 8px from bottom edge */
   left: 50%;
   transform: translateX(-50%);
   z-index: 2;
@@ -591,7 +591,6 @@ img {
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  animation: float 3s ease-in-out infinite;
 }
 
 .loading-screen__actions {
