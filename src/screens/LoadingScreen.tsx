@@ -54,6 +54,11 @@ export function LoadingScreen() {
       </video>
       <div className="loading-screen">
         <p className="loading-screen__text">hold on... this needs a closer look</p>
+        {platePreview && (
+          <div className="loading-screen__plate">
+            <img src={platePreview} alt="Uploaded plate" />
+          </div>
+        )}
         {shouldShowError && (
           <div className="loading-screen__actions">
             <PrimaryButton onClick={() => navigate('/upload')}>Try Again</PrimaryButton>
