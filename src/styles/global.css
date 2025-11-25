@@ -691,7 +691,7 @@ img {
   margin-bottom: auto;
   object-fit: contain;
   position: absolute;
-  top: 2rem; /* Align top edge with button top edges */
+  top: 0.5rem; /* Move higher, closer to top */
   left: 50%;
   transform: translateX(-50%);
   z-index: 3;
