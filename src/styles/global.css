@@ -43,10 +43,14 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text);
   min-height: 100vh;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 #root {
   min-height: 100vh;
+  height: 100vh;
+  height: 100dvh; /* Use dynamic viewport height for mobile */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 img {
@@ -68,11 +72,20 @@ img {
 }
 
 .screen-shell--splash {
-  background-color: #1a3a2e; /* Dark teal/green background */
-  position: relative;
-  overflow: hidden;
-  min-height: 100vh;
-  height: 100vh;
+  background-image: url('/assets/splash-2.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #1a3a2e; /* Fallback color */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh; /* Use dynamic viewport height for mobile */
+  overflow: hidden; /* Disable scrolling */
 }
 
 .screen-shell--upload {
