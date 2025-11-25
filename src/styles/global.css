@@ -685,13 +685,13 @@ img {
 }
 
 .result-screen__logo {
-  width: 200px;
-  height: 200px;
+  width: 300px;
+  height: 300px;
   margin-top: 0;
   margin-bottom: auto;
   object-fit: contain;
   position: absolute;
-  top: 2rem;
+  top: 2rem; /* Align top edge with button top edges */
   left: 50%;
   transform: translateX(-50%);
   z-index: 3;

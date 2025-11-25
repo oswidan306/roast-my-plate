@@ -89,7 +89,7 @@ export function ResultScreen() {
             img.onerror = reject
           }
         })
-        const logoSize = 200
+        const logoSize = 300
         const logoX = canvas.width / 2 - logoSize / 2
         const logoY = 40
         ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize)
@@ -225,7 +225,7 @@ export function ResultScreen() {
             img.onerror = reject
           }
         })
-        const logoSize = 200
+        const logoSize = 300
         const logoX = canvas.width / 2 - logoSize / 2
         const logoY = 40
         ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize)
