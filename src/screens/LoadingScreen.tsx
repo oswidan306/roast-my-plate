@@ -20,12 +20,13 @@ export function LoadingScreen() {
     }
 
     if (phase === 'processing') {
+      // Let video play entirely - approximately 10 seconds for full loop
       const timer = setTimeout(() => {
         completeRoast(
           'That turkey looks drier than my inbox after Thanksgiving. The cranberry splat? Avant-garde ketchup.',
         )
         navigate('/result', { replace: true })
-      }, 4000)
+      }, 10000) // Increased to 10 seconds to let video play
       return () => clearTimeout(timer)
     }
 
@@ -53,7 +54,7 @@ export function LoadingScreen() {
         <source src="/assets/loading.mp4" type="video/mp4" />
       </video>
       <div className="loading-screen">
-        <p className="loading-screen__text">hold on... this needs a closer look</p>
+        <p className="loading-screen__text">CHEF IS INSPECTING</p>
         {platePreview && (
           <div className="loading-screen__plate">
             <img src={platePreview} alt="Uploaded plate" />
