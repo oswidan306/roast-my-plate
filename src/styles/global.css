@@ -68,15 +68,11 @@ img {
 }
 
 .screen-shell--splash {
-  background-image: url('/assets/splash-2.png');
-  background-size: cover;
-  background-position: center top;
-  background-repeat: no-repeat;
+  background-color: #1a3a2e; /* Dark teal/green background */
   position: relative;
   overflow: hidden;
   min-height: 100vh;
   height: 100vh;
-  background-color: #1a3a2e; /* Dark teal/green to match image, prevents white space */
 }
 
 .screen-shell--upload {
