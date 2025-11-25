@@ -120,14 +120,14 @@ export function ResultScreen() {
 
       // Draw roast text with word wrapping
       ctx.fillStyle = '#fff'
-      ctx.font = '400 24px "PP Editorial New", serif'
+      ctx.font = '200 28px "PP Editorial New", serif'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'top'
       const textX = canvas.width / 2
       const textY = plateY + plateSize + 30
       const maxWidth = canvas.width - 80
-      const lineHeight = 32
-      const words = safeRoast.split(' ')
+      const lineHeight = 36
+      const words = safeRoast.toUpperCase().split(' ')
       let line = ''
       let y = textY
 
@@ -257,14 +257,14 @@ export function ResultScreen() {
 
       // Draw roast text with word wrapping
       ctx.fillStyle = '#fff'
-      ctx.font = '400 24px "PP Editorial New", serif'
+      ctx.font = '200 28px "PP Editorial New", serif'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'top'
       const textX = canvas.width / 2
       const textY = plateY + plateSize + 30
       const maxWidth = canvas.width - 80
-      const lineHeight = 32
-      const words = safeRoast.split(' ')
+      const lineHeight = 36
+      const words = safeRoast.toUpperCase().split(' ')
       let line = ''
       let y = textY
 
@@ -351,14 +351,16 @@ export function ResultScreen() {
             </svg>
           </button>
           
-          {/* Top right replace button */}
+          {/* Top right reset button */}
           <button
             className="result-screen__replace-button"
             onClick={handleReplacePlate}
-            aria-label="Replace plate"
+            aria-label="Reset"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12 3v6m0 6v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
 
@@ -370,7 +372,7 @@ export function ResultScreen() {
           <div className="result-screen__plate">
             <img src={platePreview} alt="Roasted plate" />
           </div>
-          <p className="result-screen__roast">{safeRoast}</p>
+          <p className="result-screen__roast">{safeRoast.toUpperCase()}</p>
           <button
             className="result-screen__share-button"
             onClick={handleShareToStory}
