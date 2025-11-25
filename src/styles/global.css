@@ -682,6 +682,7 @@ img {
   align-items: center;
   padding: 2rem 1.5rem;
   text-align: center;
+  overflow: visible; /* Allow logo to extend beyond padding */
 }
 
 .result-screen__logo {
@@ -691,7 +692,7 @@ img {
   margin-bottom: auto;
   object-fit: contain;
   position: absolute;
-  top: 0.5rem; /* Move higher, closer to top */
+  top: -2.5rem; /* Move much higher, above the content padding */
   left: 50%;
   transform: translateX(-50%);
   z-index: 3;
