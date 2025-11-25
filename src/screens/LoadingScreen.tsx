@@ -3,13 +3,16 @@ import { useNavigate } from 'react-router-dom'
 import { ScreenShell } from '../components/ScreenShell'
 import { PrimaryButton } from '../components/PrimaryButton'
 import { useRoastSession } from '../context/RoastSessionContext'
+import { generateRoast } from '../services/roastService'
 
 export function LoadingScreen() {
   const navigate = useNavigate()
   const {
     platePreview,
+    plateFile,
     phase,
     completeRoast,
+    failRoast,
     resetSession,
   } = useRoastSession()
 
@@ -20,14 +23,34 @@ export function LoadingScreen() {
     }
 
     if (phase === 'processing') {
-      // Let video play entirely - approximately 10 seconds for full loop
-      const timer = setTimeout(() => {
-        completeRoast(
-          'That turkey looks drier than my inbox after Thanksgiving. The cranberry splat? Avant-garde ketchup.',
-        )
-        navigate('/result', { replace: true })
-      }, 4500) // 4.5 seconds - reduced from 10 seconds
-      return () => clearTimeout(timer)
+      // Ensure we have the file
+      if (!plateFile) {
+        failRoast('No image file found. Please try uploading again.')
+        return
+      }
+
+      // Generate roast using OpenAI
+      const generateRoastAsync = async () => {
+        try {
+          // Minimum 4.5 seconds to let video play
+          const [roast] = await Promise.all([
+            generateRoast(plateFile),
+            new Promise((resolve) => setTimeout(resolve, 4500)),
+          ])
+
+          completeRoast(roast)
+          navigate('/result', { replace: true })
+        } catch (error) {
+          console.error('Error generating roast:', error)
+          failRoast(
+            error instanceof Error
+              ? error.message
+              : 'Failed to generate roast. Please try again.'
+          )
+        }
+      }
+
+      generateRoastAsync()
     }
 
     if (phase === 'error') {
@@ -38,7 +61,7 @@ export function LoadingScreen() {
     if (phase === 'complete') {
       navigate('/result', { replace: true })
     }
-  }, [phase, platePreview, completeRoast, navigate])
+  }, [phase, platePreview, plateFile, completeRoast, failRoast, navigate])
 
   const shouldShowError = phase === 'error'
 

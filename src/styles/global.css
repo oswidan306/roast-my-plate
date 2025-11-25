@@ -291,9 +291,9 @@ img {
   border: none;
   border-radius: 8px;
   font-size: 1.25rem;
-  font-weight: 400;
+  font-weight: 200; /* Ultralight */
   font-family: 'PP Editorial New', serif;
-  letter-spacing: 0.1em;
+  letter-spacing: 0; /* 0% kerning */
   text-transform: uppercase;
   cursor: pointer;
   transition: background 150ms ease, transform 150ms ease;
@@ -583,9 +583,9 @@ img {
   border: none;
   border-radius: 8px;
   font-size: 1.25rem;
-  font-weight: 400;
+  font-weight: 200; /* Ultralight */
   font-family: 'PP Editorial New', serif;
-  letter-spacing: 0.1em;
+  letter-spacing: 0; /* 0% kerning */
   text-transform: uppercase;
   cursor: pointer;
   transition: background 150ms ease, transform 150ms ease;
@@ -772,16 +772,19 @@ img {
   margin-bottom: auto;
   object-fit: contain;
   position: absolute;
-  top: 1rem; /* Adjust from -6rem to 1rem to align with buttons */
+  top: 1rem; /* Same line as buttons */
   left: 50%;
   transform: translateX(-50%);
   z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .result-screen__save-button,
 .result-screen__replace-button {
   position: absolute;
-  top: 1rem; /* Adjust from 2rem to 1rem since no padding */
+  top: 1rem; /* Same line as logo */
   width: 48px;
   height: 48px;
   border: none;
@@ -868,9 +871,9 @@ img {
   border: none;
   border-radius: 8px;
   font-size: 1.25rem;
-  font-weight: 400;
+  font-weight: 200; /* Ultralight */
   font-family: 'PP Editorial New', serif;
-  letter-spacing: 0.1em;
+  letter-spacing: 0; /* 0% kerning */
   text-transform: uppercase;
   cursor: pointer;
   transition: background 150ms ease, transform 150ms ease;
