@@ -370,7 +370,7 @@ img {
 
 .upload-screen__header {
   position: absolute;
-  top: 2rem;
+  top: 3rem; /* Move title down slightly */
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
@@ -435,10 +435,24 @@ img {
 .upload-screen__plate {
   flex: 0 0 auto;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 1;
-  margin-top: 3rem; /* Move plate further downwards */
+  margin-top: 5rem; /* Move plate further downwards */
+  gap: 1rem;
+}
+
+.upload-screen__chef-review {
+  font-family: 'PP Editorial New', serif;
+  font-size: 1rem;
+  font-weight: 200;
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  margin: 0;
+  text-align: center;
 }
 
 .upload-screen__subheader {
@@ -537,9 +551,10 @@ img {
   justify-content: center;
   border: 3px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  margin-top: auto;
-  margin-bottom: 8rem;
-  position: relative;
+  position: absolute;
+  bottom: 25%;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 2;
 }
 

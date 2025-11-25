@@ -32,6 +32,7 @@ export function UploadScreen() {
             preview={platePreview}
             onFileSelect={(file, preview) => selectPlate(file, preview)}
           />
+          <p className="upload-screen__chef-review">** FOR CHEF'S REVIEW **</p>
         </div>
         {platePreview && (
           <div className={`upload-screen__footer ${isAnimating ? 'upload-screen__footer--slide-down' : ''}`}>
