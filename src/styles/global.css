@@ -93,6 +93,31 @@ img {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh; /* Use dynamic viewport height for mobile */
+  overflow: hidden; /* Disable scrolling */
+}
+
+.screen-shell--upload::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3); /* Dark scrim overlay */
+  z-index: 0;
+}
+
+.screen-shell--upload > * {
+  position: relative;
+  z-index: 1;
 }
 
 .screen-shell--table {
@@ -135,7 +160,7 @@ img {
   flex-direction: column;
   justify-content: space-between;
   align-items: stretch;
-  padding: 3rem 1.5rem 2.5rem;
+  padding: 3rem 1.5rem calc(2.5rem - 16px); /* Move button up by 16px */
   position: relative;
   z-index: 1;
   overflow: hidden;
@@ -158,21 +183,21 @@ img {
 
 .splash__title-word--roast {
   font-weight: 400;
-  font-size: 5.75rem; /* 92px */
+  font-size: 7rem; /* 112px - increased from 92px */
   color: #dc2626;
   margin: 0;
 }
 
 .splash__title-word--my {
   font-weight: 200;
-  font-size: 2rem; /* 32px */
+  font-size: 2.5rem; /* 40px - increased from 32px */
   color: #fff;
   margin: 0.25rem 0;
 }
 
 .splash__title-word--plate {
   font-weight: 400;
-  font-size: 5.75rem; /* 92px */
+  font-size: 7rem; /* 112px - increased from 92px */
   color: #dc2626;
   margin: 0;
 }
