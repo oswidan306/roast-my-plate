@@ -46,11 +46,36 @@ body {
   overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
+/* Desktop: Constrain to iPhone 16 dimensions with black background */
+@media (min-width: 768px) {
+  body {
+    background-color: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+}
+
 #root {
   min-height: 100vh;
   height: 100vh;
   height: 100dvh; /* Use dynamic viewport height for mobile */
   overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Desktop: Constrain to iPhone 16 dimensions (393px x 852px) */
+@media (min-width: 768px) {
+  #root {
+    width: 393px;
+    height: 852px;
+    max-width: 393px;
+    max-height: 852px;
+    margin: 0 auto;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+  }
 }
 
 img {
