@@ -8,6 +8,7 @@ export function UploadScreen() {
   const navigate = useNavigate()
   const { platePreview, selectPlate, startProcessing } = useRoastSession()
   const [isAnimating, setIsAnimating] = useState(false)
+  const [isCameraOpen, setIsCameraOpen] = useState(false)
 
   const handleRoast = () => {
     setIsAnimating(true)
@@ -31,10 +32,11 @@ export function UploadScreen() {
           <CirclePlateUpload
             preview={platePreview}
             onFileSelect={(file, preview) => selectPlate(file, preview)}
+            onCameraStateChange={setIsCameraOpen}
           />
           <p className="upload-screen__chef-review">** FOR CHEF'S REVIEW **</p>
         </div>
-        {platePreview && (
+        {platePreview && !isCameraOpen && (
           <div className={`upload-screen__footer ${isAnimating ? 'upload-screen__footer--slide-down' : ''}`}>
             <button
               className="upload-screen__roast-button"

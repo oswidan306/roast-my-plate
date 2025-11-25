@@ -6,6 +6,7 @@ import { CameraCaptureModal } from './CameraCaptureModal'
 interface CirclePlateUploadProps {
   preview?: string | null
   onFileSelect: (file: File, previewUrl: string) => void
+  onCameraStateChange?: (isOpen: boolean) => void
 }
 
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/heic', 'image/heif']
@@ -13,6 +14,7 @@ const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/heic', 'image/heif']
 export function CirclePlateUpload({
   preview,
   onFileSelect,
+  onCameraStateChange,
 }: CirclePlateUploadProps) {
   const inputRef = useRef<HTMLInputElement | null>(null)
   const [showCamera, setShowCamera] = useState(false)
@@ -38,6 +40,7 @@ export function CirclePlateUpload({
       typeof navigator.mediaDevices.getUserMedia === 'function'
     ) {
       setShowCamera(true)
+      onCameraStateChange?.(true)
     } else {
       // Fallback to file picker if camera API not available
       inputRef.current?.click()
@@ -50,6 +53,7 @@ export function CirclePlateUpload({
 
   const handleCameraClose = () => {
     setShowCamera(false)
+    onCameraStateChange?.(false)
   }
 
   const handleChooseFile = () => {
