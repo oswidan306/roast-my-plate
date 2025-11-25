@@ -160,7 +160,7 @@ img {
   flex-direction: column;
   justify-content: space-between;
   align-items: stretch;
-  padding: 3rem 1.5rem calc(2.5rem - 16px); /* Move button up by 16px */
+  padding: 3rem 1.5rem calc(2.5rem - 40px); /* Move button up by 40px total (16px + 24px) */
   position: relative;
   z-index: 1;
   overflow: hidden;
@@ -459,7 +459,7 @@ img {
 
 .upload-screen__footer {
   position: absolute;
-  bottom: 2rem;
+  bottom: calc(2rem - 24px); /* Move button up by 24px */
   left: 50%;
   transform: translateX(-50%);
   z-index: 1;
