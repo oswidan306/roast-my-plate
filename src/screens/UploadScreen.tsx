@@ -26,13 +26,15 @@ export function UploadScreen() {
             <span className="upload-screen__header-word--submit">SUBMIT</span>{' '}
             <span className="upload-screen__header-word--dish">DISH</span>
           </p>
-          <p className="upload-screen__subheader-text">FOR THE CHEF'S REVIEW</p>
         </div>
         <div className="upload-screen__plate">
           <CirclePlateUpload
             preview={platePreview}
             onFileSelect={(file, preview) => selectPlate(file, preview)}
           />
+        </div>
+        <div className={`upload-screen__subheader ${isAnimating ? 'upload-screen__subheader--slide-down' : ''}`}>
+          <p className="upload-screen__subheader-text">FOR THE CHEF'S REVIEW</p>
         </div>
         {platePreview && (
           <div className={`upload-screen__footer ${isAnimating ? 'upload-screen__footer--slide-down' : ''}`}>
