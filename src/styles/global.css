@@ -67,14 +67,56 @@ body {
 /* Desktop: Constrain to iPhone 16 dimensions (393px x 852px) */
 @media (min-width: 768px) {
   #root {
-    width: 393px;
-    height: 852px;
-    max-width: 393px;
-    max-height: 852px;
+    width: 393px !important;
+    height: 852px !important;
+    max-width: 393px !important;
+    max-height: 852px !important;
+    min-width: 393px !important;
+    min-height: 852px !important;
     margin: 0 auto;
     box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
     position: relative;
     overflow: hidden;
+  }
+
+  /* Override all viewport units to fixed dimensions */
+  .screen-shell,
+  .screen-shell--splash,
+  .screen-shell--upload,
+  .screen-shell--loading,
+  .screen-shell--result {
+    width: 393px !important;
+    height: 852px !important;
+    min-width: 393px !important;
+    min-height: 852px !important;
+    max-width: 393px !important;
+    max-height: 852px !important;
+  }
+
+  .splash__container {
+    width: 393px !important;
+    height: 852px !important;
+  }
+
+  .upload-screen {
+    width: 393px !important;
+    height: 852px !important;
+  }
+
+  .loading-screen {
+    width: 393px !important;
+    height: 852px !important;
+  }
+
+  .result-screen {
+    width: 393px !important;
+    height: 852px !important;
+  }
+
+  /* Fix scrims to container, not viewport */
+  .loading-screen__scrim,
+  .result-screen__scrim {
+    position: absolute !important;
   }
 }
 
