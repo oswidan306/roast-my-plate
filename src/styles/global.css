@@ -794,8 +794,8 @@ img {
   flex: 0 0 auto;
   position: absolute;
   left: 50%;
-  top: 0;
-  transform: translateX(-50%);
+  top: 50%; /* Center vertically with buttons */
+  transform: translate(-50%, -50%); /* Center both horizontally and vertically */
   z-index: 1;
   pointer-events: none; /* Allow clicks to pass through to buttons */
 }
@@ -815,6 +815,8 @@ img {
   justify-content: center;
   transition: background 150ms ease, transform 150ms ease;
   flex-shrink: 0;
+  position: relative;
+  z-index: 2; /* Above logo */
 }
 
 .result-screen__save-button:hover,
