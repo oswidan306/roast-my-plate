@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ScreenShell } from '../components/ScreenShell'
 import { useRoastSession } from '../context/RoastSessionContext'
@@ -13,7 +13,6 @@ export function ResultScreen() {
   const navigate = useNavigate()
   const { platePreview, roastData, phase, resetSession } = useRoastSession()
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const [isSaved, setIsSaved] = useState(false)
 
   const defaultRoast = {
     target: 'plate',
@@ -45,14 +44,18 @@ export function ResultScreen() {
     if (!containerRef.current || !platePreview) return null
 
     try {
-      // Create a canvas to capture the image
+      // Create a high-resolution canvas for better quality
+      const scale = 2 // 2x resolution for retina/high DPI displays
       const canvas = document.createElement('canvas')
       const ctx = canvas.getContext('2d')
       if (!ctx) return null
 
-      // Set canvas size to match viewport
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      // Set canvas size to match viewport at higher resolution
+      canvas.width = window.innerWidth * scale
+      canvas.height = window.innerHeight * scale
+      
+      // Scale context to maintain proper sizing
+      ctx.scale(scale, scale)
 
       // Get the background image based on severity
       const bgImg = new Image()
@@ -64,16 +67,16 @@ export function ResultScreen() {
         bgImg.onerror = reject
       })
 
-      // Draw background
-      ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height)
+      // Draw background at full resolution
+      ctx.drawImage(bgImg, 0, 0, window.innerWidth, window.innerHeight)
 
       // Draw dark scrim (darker towards bottom)
-      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
+      const gradient = ctx.createLinearGradient(0, 0, 0, window.innerHeight)
       gradient.addColorStop(0, 'rgba(0, 0, 0, 0.2)')
       gradient.addColorStop(0.5, 'rgba(0, 0, 0, 0.4)')
       gradient.addColorStop(1, 'rgba(0, 0, 0, 0.7)')
       ctx.fillStyle = gradient
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.fillRect(0, 0, window.innerWidth, window.innerHeight)
 
       // Draw rating and roast text above plate
       ctx.fillStyle = '#fff'
@@ -84,8 +87,8 @@ export function ResultScreen() {
       const ratingText = `${roast.rating.toFixed(1)}/10`
       ctx.font = 'bold 48px "PP Editorial New", serif'
       ctx.fillStyle = '#dc2626'
-      const ratingX = canvas.width * 0.1 // Left side
-      const ratingY = canvas.height * 0.15 // Above plate
+      const ratingX = window.innerWidth * 0.1 // Left side
+      const ratingY = window.innerHeight * 0.15 // Above plate
       ctx.fillText(ratingText, ratingX, ratingY)
 
       // Roast text (white, below rating)
@@ -98,7 +101,7 @@ export function ResultScreen() {
       
       const roastX = ratingX
       const roastY = ratingY + 60
-      const maxWidth = canvas.width - roastX * 2
+      const maxWidth = window.innerWidth - roastX * 2
       const lineHeight = 32
       const words = roast.roast.split(' ')
       let line = ''
@@ -134,10 +137,10 @@ export function ResultScreen() {
         plateImg.onerror = reject
       })
 
-      const plateSize = Math.min(420, canvas.width * 0.7)
-      const plateX = canvas.width / 2 - plateSize / 2
+      const plateSize = Math.min(420, window.innerWidth * 0.7)
+      const plateX = window.innerWidth / 2 - plateSize / 2
       // Position 40px above bottom CTAs (CTAs are 56px + padding)
-      const plateY = canvas.height - 56 - 40 - 40 - plateSize // 40px above CTAs, 40px padding
+      const plateY = window.innerHeight - 56 - 40 - 40 - plateSize // 40px above CTAs, 40px padding
 
       // Create circular clipping for plate
       ctx.save()
@@ -153,7 +156,7 @@ export function ResultScreen() {
         ctx.font = '200 16px "PP Editorial New", serif'
         ctx.textAlign = 'center'
         ctx.textBaseline = 'bottom'
-        ctx.fillText('ROASTMYPLATE.APP', canvas.width / 2, canvas.height - 20)
+        ctx.fillText('ROASTMYPLATE.APP', window.innerWidth / 2, window.innerHeight - 20)
       }
 
       return canvas
@@ -163,60 +166,23 @@ export function ResultScreen() {
     }
   }
 
-  const handleSave = async () => {
-    // If already saved, don't do anything
-    if (isSaved) return
-
-    const canvas = await createShareImage(false)
-    if (!canvas) {
-      alert('Unable to save image. Please try again.')
-      return
-    }
-
-    canvas.toBlob(async (blob) => {
-      if (!blob) return
-
-      // Try to save to photos using Web Share API
-      if (navigator.share && navigator.canShare) {
-        const file = new File([blob], 'roast-my-plate.jpg', { type: 'image/jpeg' })
-        if (navigator.canShare({ files: [file] })) {
-          try {
-            await navigator.share({ files: [file] })
-            setIsSaved(true)
-            return
-          } catch (err) {
-            // User cancelled or dismissed - don't do anything
-            if ((err as DOMException).name === 'AbortError') {
-              return
-            }
-            // If share failed for other reason, mark as saved anyway
-            setIsSaved(true)
-            return
-          }
-        }
-      }
-
-      // If Web Share API not available, mark as saved (user can use share to story)
-      setIsSaved(true)
-    }, 'image/jpeg', 0.9)
-  }
-
   const handleReplacePlate = () => {
     resetSession()
     navigate('/upload')
   }
 
-  const handleShareToStory = async () => {
+  const handleShare = async () => {
     const canvas = await createShareImage(true)
     if (!canvas) {
       alert('Unable to create share image. Please try again.')
       return
     }
 
+    // Canvas is already at 2x resolution, convert to blob at maximum quality
     canvas.toBlob(async (blob) => {
       if (!blob) return
 
-      // Try Web Share API first
+      // Try Web Share API first (opens iOS bottom sheet)
       if (navigator.share && navigator.canShare) {
         const file = new File([blob], 'roast-my-plate.jpg', { type: 'image/jpeg' })
         if (navigator.canShare({ files: [file] })) {
@@ -233,7 +199,7 @@ export function ResultScreen() {
         }
       }
 
-      // Open Instagram Stories directly (no download)
+      // Fallback: Open Instagram Stories directly
       const instagramUrl = 'instagram://story-camera'
       
       // For iOS
@@ -250,7 +216,7 @@ export function ResultScreen() {
           window.open('https://www.instagram.com/', '_blank')
         }, 1000)
       }
-    }, 'image/jpeg', 0.9)
+    }, 'image/jpeg', 1.0) // Maximum quality (1.0)
   }
 
   if (!platePreview) {
@@ -295,19 +261,13 @@ export function ResultScreen() {
             <img src={platePreview} alt="Roasted plate" />
           </div>
 
-          {/* Bottom CTAs */}
+          {/* Bottom CTA */}
           <div className="result-screen__bottom-ctas">
             <button
-              className={`result-screen__save-button-bottom ${isSaved ? 'result-screen__save-button-bottom--saved' : ''}`}
-              onClick={handleSave}
-            >
-              {isSaved ? 'SAVED' : 'SAVE'}
-            </button>
-            <button
               className="result-screen__share-button"
-              onClick={handleShareToStory}
+              onClick={handleShare}
             >
-              SHARE TO STORY
+              SHARE
             </button>
           </div>
         </div>

@@ -473,7 +473,7 @@ img {
 .upload-screen__header-text {
   margin: 0;
   font-family: 'PP Editorial New', serif;
-  font-size: clamp(3rem, 8vw, 5.125rem); /* Responsive: 48px to 82px */
+  font-size: clamp(4.5rem, 8vw, 5.125rem); /* Responsive: 48px to 82px */
   font-weight: 200;
   text-transform: uppercase;
   letter-spacing: 0; /* Decreased from 0.05em (4%) to 0 */
@@ -533,7 +533,7 @@ img {
 
 .upload-screen__chef-review {
   font-family: 'PP Editorial New', serif;
-  font-size: clamp(0.875rem, 2.5vw, 1.25rem); /* Responsive: 14px to 20px */
+  font-size: clamp(1.5rem, 2.5vw, 1.25rem); /* Responsive: 14px to 20px */
   font-weight: 200;
   color: rgba(255, 255, 255, 0.9);
   text-transform: uppercase;
@@ -637,7 +637,7 @@ img {
 
 .loading-screen__text {
   font-family: 'PP Editorial New', serif;
-  font-size: 1.25rem; /* Much smaller to fit on 2 lines */
+  font-size: 2rem; /* Much smaller to fit on 2 lines */
   font-weight: 200;
   color: #fff;
   text-align: center;
@@ -940,45 +940,11 @@ img {
   left: 1.5rem;
   right: 1.5rem;
   display: flex;
-  gap: 1rem;
   z-index: 10;
 }
 
-.result-screen__save-button-bottom {
-  flex: 0 0 33.333%;
-  height: 56px;
-  padding: 0;
-  background: #fff;
-  color: #000;
-  border: none;
-  border-radius: 0;
-  font-size: 1.25rem;
-  font-weight: 200;
-  font-family: 'PP Editorial New', serif;
-  letter-spacing: 0;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: background 150ms ease, transform 150ms ease, opacity 150ms ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.result-screen__save-button-bottom:hover:not(.result-screen__save-button-bottom--saved) {
-  background: #f0f0f0;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-}
-
-.result-screen__save-button-bottom:active:not(.result-screen__save-button-bottom--saved) {
-  transform: translateY(0);
-}
-
-.result-screen__save-button-bottom--saved {
-  opacity: 0.6;
-  cursor: default;
-}
-
 .result-screen__share-button {
-  flex: 0 0 66.666%;
+  width: 100%;
   height: 56px;
   padding: 0;
   background: #dc2626;
