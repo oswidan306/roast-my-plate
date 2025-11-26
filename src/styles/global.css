@@ -289,7 +289,7 @@ img {
   background: #dc2626;
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 0;
   font-size: 1.25rem;
   font-weight: 200; /* Ultralight */
   font-family: 'PP Editorial New', serif;
@@ -313,7 +313,7 @@ img {
 .primary-button {
   width: 100%;
   border: none;
-  border-radius: 8px;
+  border-radius: 0;
   padding: 1rem 1.5rem;
   font-size: 1.25rem;
   font-weight: 200; /* Ultralight */
@@ -583,7 +583,7 @@ img {
   background: #dc2626;
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 0;
   font-size: 1.25rem;
   font-weight: 200; /* Ultralight */
   font-family: 'PP Editorial New', serif;
@@ -676,6 +676,54 @@ img {
   border-radius: 50%;
 }
 
+.loading-screen__progress-container {
+  position: absolute;
+  bottom: calc(8px + min(420px, 85vw) + 1.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 3rem);
+  max-width: 400px;
+  z-index: 3;
+}
+
+.loading-screen__progress-bar {
+  width: 100%;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 3px solid #fff;
+  position: relative;
+  box-shadow: 
+    inset 0 0 0 2px #000,
+    0 0 0 2px #000;
+}
+
+.loading-screen__progress-fill {
+  height: 100%;
+  background: #dc2626;
+  border-right: 3px solid #fff;
+  box-shadow: 
+    inset 0 0 0 2px #000,
+    0 0 0 2px #000;
+  transition: width 0.1s linear;
+  position: relative;
+}
+
+.loading-screen__progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 8px,
+    rgba(255, 255, 255, 0.1) 8px,
+    rgba(255, 255, 255, 0.1) 16px
+  );
+}
+
 .loading-screen__actions {
   position: absolute;
   bottom: 2rem;
@@ -739,7 +787,11 @@ img {
   width: 100%;
   height: 100vh;
   height: 100dvh;
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -774,13 +826,13 @@ img {
 
 .result-screen__top-bar {
   position: absolute;
-  top: 1rem;
+  top: 0;
   left: 0;
   right: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1.5rem;
+  padding: 1rem 1.5rem;
   z-index: 10;
   width: 100%;
 }
@@ -887,13 +939,13 @@ img {
 }
 
 .result-screen__save-button-bottom {
-  flex: 1;
+  flex: 0 0 33.333%;
   height: 56px;
   padding: 0;
   background: #fff;
   color: #000;
   border: none;
-  border-radius: 8px;
+  border-radius: 0;
   font-size: 1.25rem;
   font-weight: 200;
   font-family: 'PP Editorial New', serif;
@@ -915,13 +967,13 @@ img {
 }
 
 .result-screen__share-button {
-  flex: 1;
+  flex: 0 0 66.666%;
   height: 56px;
   padding: 0;
   background: #dc2626;
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 0;
   font-size: 1.25rem;
   font-weight: 200;
   font-family: 'PP Editorial New', serif;

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ScreenShell } from '../components/ScreenShell'
 import { PrimaryButton } from '../components/PrimaryButton'
@@ -15,6 +15,7 @@ export function LoadingScreen() {
     failRoast,
     resetSession,
   } = useRoastSession()
+  const [progress, setProgress] = useState(0)
 
   useEffect(() => {
     if (!platePreview) {
@@ -32,14 +33,31 @@ export function LoadingScreen() {
       // Generate roast using OpenAI
       const generateRoastAsync = async () => {
         try {
+          // Animate progress bar
+          const progressInterval = setInterval(() => {
+            setProgress((prev) => {
+              if (prev >= 95) {
+                clearInterval(progressInterval)
+                return 95
+              }
+              return prev + 2
+            })
+          }, 90) // Update every 90ms for ~4.5 seconds
+
           // Minimum 4.5 seconds to let video play
           const [roastData] = await Promise.all([
             generateRoast(plateFile),
             new Promise((resolve) => setTimeout(resolve, 4500)),
           ])
 
-          completeRoast(roastData)
-          navigate('/result', { replace: true })
+          clearInterval(progressInterval)
+          setProgress(100)
+          
+          // Small delay to show 100%
+          setTimeout(() => {
+            completeRoast(roastData)
+            navigate('/result', { replace: true })
+          }, 200)
         } catch (error) {
           console.error('Error generating roast:', error)
           failRoast(
@@ -84,6 +102,15 @@ export function LoadingScreen() {
             <img src={platePreview} alt="Uploaded plate" />
           </div>
         )}
+        {/* 8-bit style progress bar */}
+        <div className="loading-screen__progress-container">
+          <div className="loading-screen__progress-bar">
+            <div 
+              className="loading-screen__progress-fill"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
         {shouldShowError && (
           <div className="loading-screen__actions">
             <PrimaryButton onClick={() => navigate('/upload')}>Try Again</PrimaryButton>

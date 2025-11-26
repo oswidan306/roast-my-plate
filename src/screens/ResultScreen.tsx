@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo } from 'react'
+import { useEffect, useRef, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ScreenShell } from '../components/ScreenShell'
 import { useRoastSession } from '../context/RoastSessionContext'
@@ -13,6 +13,7 @@ export function ResultScreen() {
   const navigate = useNavigate()
   const { platePreview, roastData, phase, resetSession } = useRoastSession()
   const containerRef = useRef<HTMLDivElement | null>(null)
+  const [isSaved, setIsSaved] = useState(false)
 
   const defaultRoast = {
     target: 'plate',
@@ -169,9 +170,25 @@ export function ResultScreen() {
       return
     }
 
-    canvas.toBlob((blob) => {
+    canvas.toBlob(async (blob) => {
       if (!blob) return
 
+      // Try to save to photos using Web Share API or download
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], 'roast-my-plate.jpg', { type: 'image/jpeg' })
+        if (navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({ files: [file] })
+            setIsSaved(true)
+            setTimeout(() => setIsSaved(false), 2000)
+            return
+          } catch (err) {
+            // Fall through to download
+          }
+        }
+      }
+
+      // Fallback: Download (will save to Photos on mobile)
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
@@ -180,6 +197,9 @@ export function ResultScreen() {
       link.click()
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
+      
+      setIsSaved(true)
+      setTimeout(() => setIsSaved(false), 2000)
     }, 'image/jpeg', 0.9)
   }
 
@@ -198,49 +218,43 @@ export function ResultScreen() {
     canvas.toBlob(async (blob) => {
       if (!blob) return
 
-      // Check if Web Share API supports files
-      if (navigator.share && navigator.canShare) {
-        const file = new File([blob], 'roast-my-plate.jpg', { type: 'image/jpeg' })
+      // Convert blob to data URL for Instagram
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const dataUrl = reader.result as string
         
-        // Check if we can share files
-        if (navigator.canShare({ files: [file] })) {
-          try {
-            await navigator.share({
-              files: [file],
-              title: 'Roast My Plate',
-              text: roast.roast,
-            })
-            // Share was successful
-            return
-          } catch (err) {
-            // User cancelled or share failed
-            if ((err as DOMException).name === 'AbortError') {
-              return // User cancelled, don't show error
-            }
-            console.error('Share failed:', err)
-            // Fall through to download fallback
+        // Save image first, then open Instagram
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = 'roast-my-plate.jpg'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+
+        // Open Instagram Stories directly
+        setTimeout(() => {
+          // Try Instagram deep link for stories
+          const instagramUrl = 'instagram://story-camera'
+          
+          // For iOS
+          if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+            window.location.href = instagramUrl
+            // Fallback to web if app doesn't open
+            setTimeout(() => {
+              window.location.href = 'https://www.instagram.com/'
+            }, 1000)
+          } else {
+            // For Android
+            window.location.href = instagramUrl
+            setTimeout(() => {
+              window.open('https://www.instagram.com/', '_blank')
+            }, 1000)
           }
-        }
+        }, 300)
       }
-
-      // Fallback: Download the image
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = 'roast-my-plate.jpg'
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
-
-      // Try to open Instagram as fallback
-      setTimeout(() => {
-        if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-          window.location.href = 'instagram://story-camera'
-        } else {
-          window.open('instagram://story-camera', '_blank')
-        }
-      }, 500)
+      reader.readAsDataURL(blob)
     }, 'image/jpeg', 0.9)
   }
 
@@ -294,7 +308,7 @@ export function ResultScreen() {
               className="result-screen__save-button-bottom"
               onClick={handleSave}
             >
-              SAVE
+              {isSaved ? 'SAVED' : 'SAVE'}
             </button>
             <button
               className="result-screen__share-button"
