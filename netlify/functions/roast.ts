@@ -131,6 +131,10 @@ export const handler: Handler = async (event) => {
     if (!payload.imageBase64 || !payload.mimeType) {
       return {
         statusCode: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
         body: JSON.stringify({ error: 'Missing image data' }),
       }
     }
