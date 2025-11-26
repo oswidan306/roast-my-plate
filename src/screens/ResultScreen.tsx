@@ -218,43 +218,36 @@ export function ResultScreen() {
     canvas.toBlob(async (blob) => {
       if (!blob) return
 
-      // Convert blob to data URL for Instagram
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        const dataUrl = reader.result as string
-        
-        // Save image first, then open Instagram
-        const url = URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        link.download = 'roast-my-plate.jpg'
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        URL.revokeObjectURL(url)
+      // Save image first, then open Instagram
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'roast-my-plate.jpg'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
 
-        // Open Instagram Stories directly
-        setTimeout(() => {
-          // Try Instagram deep link for stories
-          const instagramUrl = 'instagram://story-camera'
-          
-          // For iOS
-          if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-            window.location.href = instagramUrl
-            // Fallback to web if app doesn't open
-            setTimeout(() => {
-              window.location.href = 'https://www.instagram.com/'
-            }, 1000)
-          } else {
-            // For Android
-            window.location.href = instagramUrl
-            setTimeout(() => {
-              window.open('https://www.instagram.com/', '_blank')
-            }, 1000)
-          }
-        }, 300)
-      }
-      reader.readAsDataURL(blob)
+      // Open Instagram Stories directly
+      setTimeout(() => {
+        // Try Instagram deep link for stories
+        const instagramUrl = 'instagram://story-camera'
+        
+        // For iOS
+        if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+          window.location.href = instagramUrl
+          // Fallback to web if app doesn't open
+          setTimeout(() => {
+            window.location.href = 'https://www.instagram.com/'
+          }, 1000)
+        } else {
+          // For Android
+          window.location.href = instagramUrl
+          setTimeout(() => {
+            window.open('https://www.instagram.com/', '_blank')
+          }, 1000)
+        }
+      }, 300)
     }, 'image/jpeg', 0.9)
   }
 
