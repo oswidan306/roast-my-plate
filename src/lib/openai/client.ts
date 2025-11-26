@@ -37,11 +37,16 @@ export async function fileToBase64(file: File): Promise<string> {
 export async function requestRoast(payload: RoastPayload): Promise<RoastResponse> {
   const apiKey = import.meta.env.VITE_OPENAI_API_KEY
 
+  console.log('[roast] Checking API key...', {
+    hasKey: !!apiKey,
+    keyLength: apiKey?.length || 0,
+    envKeys: Object.keys(import.meta.env).filter(k => k.includes('OPENAI')),
+  })
+
   if (!apiKey) {
-    throw new Error(
-      'OpenAI API key not found. Please set VITE_OPENAI_API_KEY in your .env file. ' +
-      'For production, use a backend API endpoint instead.'
-    )
+    const errorMsg = 'OpenAI API key not found. Please set VITE_OPENAI_API_KEY in your environment variables.'
+    console.error('[roast]', errorMsg)
+    throw new Error(errorMsg)
   }
 
   const openai = new OpenAI({

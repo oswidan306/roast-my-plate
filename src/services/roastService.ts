@@ -15,17 +15,17 @@ async function fileToBase64(file: File): Promise<string> {
   })
 }
 
-interface RoastResponse {
-  headline: string
+export interface RoastResponse {
   target: string
   roast: string
+  rating: number
   severity: 'LOW' | 'MEDIUM' | 'HIGH'
 }
 
 /**
  * Generates a roast for a plate image using Netlify function
  */
-export async function generateRoast(file: File): Promise<string> {
+export async function generateRoast(file: File): Promise<RoastResponse> {
   try {
     // Convert file to base64
     const imageBase64 = await fileToBase64(file)
@@ -70,8 +70,7 @@ export async function generateRoast(file: File): Promise<string> {
     const data: RoastResponse = await response.json()
     console.log('[roast] Success! Received:', data)
     
-    // Format the response as: "HEADLINE\n\nroast sentence"
-    return `${data.headline}\n\n${data.roast}`
+    return data
   } catch (error) {
     console.error('[roast] Error generating roast:', error)
     

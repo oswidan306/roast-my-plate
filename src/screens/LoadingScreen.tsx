@@ -33,12 +33,12 @@ export function LoadingScreen() {
       const generateRoastAsync = async () => {
         try {
           // Minimum 4.5 seconds to let video play
-          const [roast] = await Promise.all([
+          const [roastData] = await Promise.all([
             generateRoast(plateFile),
             new Promise((resolve) => setTimeout(resolve, 4500)),
           ])
 
-          completeRoast(roast)
+          completeRoast(roastData)
           navigate('/result', { replace: true })
         } catch (error) {
           console.error('Error generating roast:', error)

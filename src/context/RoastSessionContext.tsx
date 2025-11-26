@@ -6,6 +6,7 @@ import {
   useMemo,
   useState,
 } from 'react'
+import type { RoastResponse } from '../services/roastService'
 
 type RoastPhase = 'idle' | 'ready' | 'processing' | 'complete' | 'error'
 
@@ -13,14 +14,14 @@ interface RoastSessionState {
   phase: RoastPhase
   plateFile: File | null
   platePreview: string | null
-  roastText: string
+  roastData: RoastResponse | null
   error: string | null
 }
 
 interface RoastSessionContextValue extends RoastSessionState {
   selectPlate: (file: File, previewUrl: string) => void
   startProcessing: () => void
-  completeRoast: (roast: string) => void
+  completeRoast: (roast: RoastResponse) => void
   failRoast: (message: string) => void
   resetSession: () => void
 }
@@ -33,7 +34,7 @@ const initialState: RoastSessionState = {
   phase: 'idle',
   plateFile: null,
   platePreview: null,
-  roastText: '',
+  roastData: null,
   error: null,
 }
 
@@ -50,7 +51,7 @@ export function RoastSessionProvider({ children }: { children: ReactNode }) {
         phase: 'ready',
         plateFile: file,
         platePreview: previewUrl,
-        roastText: '',
+        roastData: null,
         error: null,
       }
     })
@@ -64,10 +65,10 @@ export function RoastSessionProvider({ children }: { children: ReactNode }) {
     }))
   }, [])
 
-  const completeRoast = useCallback((roast: string) => {
+  const completeRoast = useCallback((roast: RoastResponse) => {
     setState((prev) => ({
       ...prev,
-      roastText: roast,
+      roastData: roast,
       phase: 'complete',
       error: null,
     }))

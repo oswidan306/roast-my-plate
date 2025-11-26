@@ -747,7 +747,7 @@ img {
 }
 
 .result-screen__scrim {
-  position: fixed; /* Use fixed to cover entire viewport */
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
@@ -768,9 +768,7 @@ img {
   height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 0 1.5rem 2rem 1.5rem; /* Remove top padding, keep bottom and sides */
-  text-align: center;
+  padding: 0 1.5rem;
   overflow: visible;
 }
 
@@ -788,25 +786,21 @@ img {
 }
 
 .result-screen__logo {
-  width: 300px;
-  height: 300px;
+  width: 200px;
+  height: auto;
   object-fit: contain;
   flex: 0 0 auto;
-  position: absolute;
-  left: 50%;
-  top: 50%; /* Center vertically with buttons */
-  transform: translate(-50%, -50%); /* Center both horizontally and vertically */
+  position: relative;
   z-index: 1;
-  pointer-events: none; /* Allow clicks to pass through to buttons */
+  pointer-events: none;
 }
 
-.result-screen__save-button,
 .result-screen__replace-button {
   width: 48px;
   height: 48px;
   border: none;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
   color: #fff;
   cursor: pointer;
@@ -816,35 +810,61 @@ img {
   transition: background 150ms ease, transform 150ms ease;
   flex-shrink: 0;
   position: relative;
-  z-index: 2; /* Above logo */
+  z-index: 2;
 }
 
-.result-screen__save-button:hover,
 .result-screen__replace-button:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.7);
   transform: scale(1.1);
 }
 
-.result-screen__save-button:active,
 .result-screen__replace-button:active {
   transform: scale(0.95);
 }
 
+.result-screen__roast-section {
+  position: absolute;
+  top: 15%;
+  left: 1.5rem;
+  right: 1.5rem;
+  z-index: 3;
+  text-align: left;
+}
+
+.result-screen__rating {
+  font-family: 'PP Editorial New', serif;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #dc2626;
+  margin: 0 0 0.5rem;
+  line-height: 1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.result-screen__roast-text {
+  font-family: 'PP Editorial New', serif;
+  font-size: 1.5rem;
+  font-weight: 200;
+  color: #fff;
+  margin: 0;
+  line-height: 1.4;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0;
+}
+
 .result-screen__plate {
   width: min(420px, 85vw);
-  height: min(420px, 85vw); /* Force equal width and height for perfect circle */
-  min-width: min(420px, 85vw);
-  min-height: min(420px, 85vw);
-  max-width: min(420px, 85vw);
-  max-height: min(420px, 85vw);
+  height: min(420px, 85vw);
   aspect-ratio: 1;
   border-radius: 50%;
   overflow: hidden;
-  margin-top: calc(50vh - 210px - 4rem); /* Position halfway down, accounting for logo */
-  margin-bottom: 1.5rem;
+  position: absolute;
+  bottom: calc(56px + 40px + 1.5rem); /* 40px above bottom CTAs (56px button + padding) */
+  left: 50%;
+  transform: translateX(-50%);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  position: relative;
   flex-shrink: 0;
+  z-index: 3;
 }
 
 .result-screen__plate img {
@@ -854,59 +874,62 @@ img {
   object-position: center;
   border-radius: 50%;
   display: block;
-  aspect-ratio: 1;
 }
 
-.result-screen__roast {
-  text-align: center;
-  margin: 0 0 2rem;
-  padding: 0 1rem;
-  max-width: 600px;
+.result-screen__bottom-ctas {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  z-index: 10;
 }
 
-.result-screen__roast-headline {
+.result-screen__save-button-bottom {
+  flex: 1;
+  height: 56px;
+  padding: 0;
+  background: #fff;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.25rem;
+  font-weight: 200;
   font-family: 'PP Editorial New', serif;
-  font-size: clamp(1.75rem, 4vw, 2.25rem);
-  font-weight: 200; /* Ultralight */
-  color: #fff;
-  text-align: center;
-  margin: 0 0 0.5rem;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0;
   text-transform: uppercase;
-  letter-spacing: 0; /* 0% kerning */
-  line-height: 1.2;
+  cursor: pointer;
+  transition: background 150ms ease, transform 150ms ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.result-screen__roast-text {
-  font-family: 'PP Editorial New', serif;
-  font-size: clamp(1.5rem, 4vw, 2rem);
-  font-weight: 200; /* Ultralight */
-  color: #fff;
-  text-align: center;
-  margin: 0;
-  line-height: 1.5;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  letter-spacing: 0; /* 0% kerning */
+.result-screen__save-button-bottom:hover {
+  background: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.result-screen__save-button-bottom:active {
+  transform: translateY(0);
 }
 
 .result-screen__share-button {
-  width: 100%;
-  max-width: 400px;
-  height: 96px;
+  flex: 1;
+  height: 56px;
   padding: 0;
   background: #dc2626;
   color: #fff;
   border: none;
   border-radius: 8px;
   font-size: 1.25rem;
-  font-weight: 200; /* Ultralight */
+  font-weight: 200;
   font-family: 'PP Editorial New', serif;
-  letter-spacing: 0; /* 0% kerning */
+  letter-spacing: 0;
   text-transform: uppercase;
   cursor: pointer;
   transition: background 150ms ease, transform 150ms ease;
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
-  margin-bottom: 2rem;
 }
 
 .result-screen__share-button:hover {

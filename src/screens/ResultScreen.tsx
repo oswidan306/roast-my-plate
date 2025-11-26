@@ -1,31 +1,32 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ScreenShell } from '../components/ScreenShell'
 import { useRoastSession } from '../context/RoastSessionContext'
 
-// Chef background images - will be added to public/assets
-const CHEF_BACKGROUNDS = [
-  '/assets/chef-1.png',
-  '/assets/chef-2.png',
-  '/assets/chef-3.png',
-]
-
-const CHEF_INDEX_KEY = 'roast-my-plate-chef-index'
+const RESULT_BACKGROUNDS = {
+  LOW: '/assets/result-1.png',
+  MEDIUM: '/assets/result-2.png',
+  HIGH: '/assets/result-3.png',
+}
 
 export function ResultScreen() {
   const navigate = useNavigate()
-  const { platePreview, roastText, phase } = useRoastSession()
+  const { platePreview, roastData, phase, resetSession } = useRoastSession()
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const [selectedChef, setSelectedChef] = useState(0)
 
-  const safeRoast =
-    roastText ||
-    'PLACEHOLDER\n\nThis turkey died twice.'
-  
-  // Format roast: split headline and roast if they exist
-  const roastParts = safeRoast.split('\n\n')
-  const headline = roastParts[0] || ''
-  const roast = roastParts[1] || safeRoast
+  const defaultRoast = {
+    target: 'plate',
+    roast: 'This plate looks like the ingredients filed for divorce.',
+    rating: 2.1,
+    severity: 'MEDIUM' as const,
+  }
+
+  const roast = roastData || defaultRoast
+
+  // Get background based on severity
+  const resultBackground = useMemo(() => {
+    return RESULT_BACKGROUNDS[roast.severity] || RESULT_BACKGROUNDS.MEDIUM
+  }, [roast.severity])
 
   useEffect(() => {
     if (!platePreview) {
@@ -37,166 +38,25 @@ export function ResultScreen() {
       navigate('/loading', { replace: true })
       return
     }
-
-    // Cycle through chef backgrounds
-    const currentIndex = parseInt(localStorage.getItem(CHEF_INDEX_KEY) || '0', 10)
-    const nextIndex = (currentIndex + 1) % CHEF_BACKGROUNDS.length
-    localStorage.setItem(CHEF_INDEX_KEY, nextIndex.toString())
-    setSelectedChef(nextIndex)
   }, [platePreview, phase, navigate])
 
-  const handleSave = async () => {
-    if (!containerRef.current || !platePreview) return
-
-    try {
-      // Create a canvas to capture the image (without buttons)
-      const canvas = document.createElement('canvas')
-      const ctx = canvas.getContext('2d')
-      if (!ctx) return
-
-      // Set canvas size to match viewport
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
-
-      // Get the background image
-      const bgImg = new Image()
-      bgImg.crossOrigin = 'anonymous'
-      bgImg.src = CHEF_BACKGROUNDS[selectedChef]
-
-      await new Promise((resolve, reject) => {
-        bgImg.onload = resolve
-        bgImg.onerror = reject
-      })
-
-      // Draw background
-      ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height)
-
-      // Draw dark scrim (darker towards bottom)
-      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
-      gradient.addColorStop(0, 'rgba(0, 0, 0, 0.2)')
-      gradient.addColorStop(0.5, 'rgba(0, 0, 0, 0.4)')
-      gradient.addColorStop(1, 'rgba(0, 0, 0, 0.7)')
-      ctx.fillStyle = gradient
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-      // Draw logo at top
-      try {
-        const logoImg = new Image()
-        logoImg.crossOrigin = 'anonymous'
-        logoImg.src = '/assets/RMP-logo.svg'
-        await new Promise((resolve, reject) => {
-          logoImg.onload = resolve
-          logoImg.onerror = () => {
-            const img = new Image()
-            img.crossOrigin = 'anonymous'
-            img.src = '/assets/RMP-logo.svg'
-            img.onload = resolve
-            img.onerror = reject
-          }
-        })
-        const logoSize = 300
-        const logoX = canvas.width / 2 - logoSize / 2
-        const logoY = 40
-        ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize)
-      } catch (err) {
-        console.warn('Could not load logo:', err)
-      }
-
-      // Draw plate image
-      const plateImg = new Image()
-      plateImg.crossOrigin = 'anonymous'
-      plateImg.src = platePreview
-      await new Promise((resolve, reject) => {
-        plateImg.onload = resolve
-        plateImg.onerror = reject
-      })
-
-      const plateSize = Math.min(420, canvas.width * 0.7)
-      const plateX = canvas.width / 2 - plateSize / 2
-      const plateY = canvas.height * 0.4
-
-      // Create circular clipping for plate
-      ctx.save()
-      ctx.beginPath()
-      ctx.arc(plateX + plateSize / 2, plateY + plateSize / 2, plateSize / 2, 0, Math.PI * 2)
-      ctx.clip()
-      ctx.drawImage(plateImg, plateX, plateY, plateSize, plateSize)
-      ctx.restore()
-
-      // Draw roast text with word wrapping
-      ctx.fillStyle = '#fff'
-      ctx.font = '200 28px "PP Editorial New", serif'
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'top'
-      const textX = canvas.width / 2
-      const textY = plateY + plateSize + 30
-      const maxWidth = canvas.width - 80
-      const lineHeight = 36
-      const words = safeRoast.toUpperCase().split(' ')
-      let line = ''
-      let y = textY
-
-      // Add text shadow effect
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'
-      ctx.shadowBlur = 4
-      ctx.shadowOffsetX = 0
-      ctx.shadowOffsetY = 2
-
-      for (let i = 0; i < words.length; i++) {
-        const testLine = line + words[i] + ' '
-        const metrics = ctx.measureText(testLine)
-        if (metrics.width > maxWidth && i > 0) {
-          ctx.fillText(line.trim(), textX, y)
-          line = words[i] + ' '
-          y += lineHeight
-        } else {
-          line = testLine
-        }
-      }
-      if (line.trim()) {
-        ctx.fillText(line.trim(), textX, y)
-      }
-
-      // Convert to blob and download
-      canvas.toBlob((blob) => {
-        if (!blob) return
-
-        const url = URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        link.download = 'roast-my-plate.jpg'
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        URL.revokeObjectURL(url)
-      }, 'image/jpeg', 0.9)
-    } catch (error) {
-      console.error('Error creating save image:', error)
-      alert('Unable to save image. Please try again.')
-    }
-  }
-
-  const handleReplacePlate = () => {
-    navigate('/upload')
-  }
-
-  const handleShareToStory = async () => {
-    if (!containerRef.current || !platePreview) return
+  const createShareImage = async (includeUrl: boolean = false) => {
+    if (!containerRef.current || !platePreview) return null
 
     try {
       // Create a canvas to capture the image
       const canvas = document.createElement('canvas')
       const ctx = canvas.getContext('2d')
-      if (!ctx) return
+      if (!ctx) return null
 
       // Set canvas size to match viewport
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
 
-      // Get the background image
+      // Get the background image based on severity
       const bgImg = new Image()
       bgImg.crossOrigin = 'anonymous'
-      bgImg.src = CHEF_BACKGROUNDS[selectedChef]
+      bgImg.src = resultBackground
 
       await new Promise((resolve, reject) => {
         bgImg.onload = resolve
@@ -214,32 +74,57 @@ export function ResultScreen() {
       ctx.fillStyle = gradient
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-      // Draw logo at top
-      try {
-        const logoImg = new Image()
-        logoImg.crossOrigin = 'anonymous'
-        logoImg.src = '/assets/RMP-logo.svg'
-        await new Promise((resolve, reject) => {
-          logoImg.onload = resolve
-          logoImg.onerror = () => {
-            // If SVG fails, try to load as image
-            const img = new Image()
-            img.crossOrigin = 'anonymous'
-            img.src = '/assets/RMP-logo.svg'
-            img.onload = resolve
-            img.onerror = reject
-          }
-        })
-        const logoSize = 300
-        const logoX = canvas.width / 2 - logoSize / 2
-        const logoY = 40
-        ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize)
-      } catch (err) {
-        console.warn('Could not load logo:', err)
-        // Continue without logo
+      // Draw rating and roast text above plate
+      ctx.fillStyle = '#fff'
+      ctx.textAlign = 'left'
+      ctx.textBaseline = 'top'
+      
+      // Rating (large, red number)
+      const ratingText = `${roast.rating.toFixed(1)}/10`
+      ctx.font = 'bold 48px "PP Editorial New", serif'
+      ctx.fillStyle = '#dc2626'
+      const ratingX = canvas.width * 0.1 // Left side
+      const ratingY = canvas.height * 0.15 // Above plate
+      ctx.fillText(ratingText, ratingX, ratingY)
+
+      // Roast text (white, below rating)
+      ctx.font = '200 24px "PP Editorial New", serif'
+      ctx.fillStyle = '#fff'
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'
+      ctx.shadowBlur = 4
+      ctx.shadowOffsetX = 0
+      ctx.shadowOffsetY = 2
+      
+      const roastX = ratingX
+      const roastY = ratingY + 60
+      const maxWidth = canvas.width - roastX * 2
+      const lineHeight = 32
+      const words = roast.roast.split(' ')
+      let line = ''
+      let y = roastY
+
+      for (let i = 0; i < words.length; i++) {
+        const testLine = line + words[i] + ' '
+        const metrics = ctx.measureText(testLine)
+        if (metrics.width > maxWidth && i > 0) {
+          ctx.fillText(line.trim(), roastX, y)
+          line = words[i] + ' '
+          y += lineHeight
+        } else {
+          line = testLine
+        }
+      }
+      if (line.trim()) {
+        ctx.fillText(line.trim(), roastX, y)
       }
 
-      // Draw plate image
+      // Reset shadow
+      ctx.shadowColor = 'transparent'
+      ctx.shadowBlur = 0
+      ctx.shadowOffsetX = 0
+      ctx.shadowOffsetY = 0
+
+      // Draw plate image (positioned 40px above bottom CTAs)
       const plateImg = new Image()
       plateImg.crossOrigin = 'anonymous'
       plateImg.src = platePreview
@@ -250,7 +135,8 @@ export function ResultScreen() {
 
       const plateSize = Math.min(420, canvas.width * 0.7)
       const plateX = canvas.width / 2 - plateSize / 2
-      const plateY = canvas.height * 0.4 // Halfway down
+      // Position 40px above bottom CTAs (CTAs are 56px + padding)
+      const plateY = canvas.height - 56 - 40 - 40 - plateSize // 40px above CTAs, 40px padding
 
       // Create circular clipping for plate
       ctx.save()
@@ -260,75 +146,102 @@ export function ResultScreen() {
       ctx.drawImage(plateImg, plateX, plateY, plateSize, plateSize)
       ctx.restore()
 
-      // Draw roast text with word wrapping
-      ctx.fillStyle = '#fff'
-      ctx.font = '200 28px "PP Editorial New", serif'
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'top'
-      const textX = canvas.width / 2
-      const textY = plateY + plateSize + 30
-      const maxWidth = canvas.width - 80
-      const lineHeight = 36
-      const words = safeRoast.toUpperCase().split(' ')
-      let line = ''
-      let y = textY
-
-      // Add text shadow effect
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'
-      ctx.shadowBlur = 4
-      ctx.shadowOffsetX = 0
-      ctx.shadowOffsetY = 2
-
-      for (let i = 0; i < words.length; i++) {
-        const testLine = line + words[i] + ' '
-        const metrics = ctx.measureText(testLine)
-        if (metrics.width > maxWidth && i > 0) {
-          ctx.fillText(line.trim(), textX, y)
-          line = words[i] + ' '
-          y += lineHeight
-        } else {
-          line = testLine
-        }
-      }
-      if (line.trim()) {
-        ctx.fillText(line.trim(), textX, y)
+      // Draw URL at bottom if sharing
+      if (includeUrl) {
+        ctx.fillStyle = '#fff'
+        ctx.font = '200 16px "PP Editorial New", serif'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'bottom'
+        ctx.fillText('ROASTMYPLATE.APP', canvas.width / 2, canvas.height - 20)
       }
 
-      // Convert to blob and download
-      canvas.toBlob((blob) => {
-        if (!blob) return
-
-        const url = URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        link.download = 'roast-my-plate.jpg'
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        URL.revokeObjectURL(url)
-
-        // Try to open Instagram Stories
-        // On iOS, try the deep link
-        if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-          // Try Instagram app deep link
-          window.location.href = 'instagram://story-camera'
-          // Fallback after a short delay
-          setTimeout(() => {
-            // If deep link didn't work, try opening Instagram web
-            window.open('https://www.instagram.com/', '_blank')
-          }, 1000)
-        } else {
-          // For Android or other platforms
-          window.open('instagram://story-camera', '_blank')
-          setTimeout(() => {
-            window.open('https://www.instagram.com/', '_blank')
-          }, 500)
-        }
-      }, 'image/jpeg', 0.9)
+      return canvas
     } catch (error) {
       console.error('Error creating share image:', error)
-      alert('Unable to create share image. Please try again.')
+      return null
     }
+  }
+
+  const handleSave = async () => {
+    const canvas = await createShareImage(false)
+    if (!canvas) {
+      alert('Unable to save image. Please try again.')
+      return
+    }
+
+    canvas.toBlob((blob) => {
+      if (!blob) return
+
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'roast-my-plate.jpg'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    }, 'image/jpeg', 0.9)
+  }
+
+  const handleReplacePlate = () => {
+    resetSession()
+    navigate('/upload')
+  }
+
+  const handleShareToStory = async () => {
+    const canvas = await createShareImage(true)
+    if (!canvas) {
+      alert('Unable to create share image. Please try again.')
+      return
+    }
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) return
+
+      // Check if Web Share API supports files
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], 'roast-my-plate.jpg', { type: 'image/jpeg' })
+        
+        // Check if we can share files
+        if (navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: 'Roast My Plate',
+              text: roast.roast,
+            })
+            // Share was successful
+            return
+          } catch (err) {
+            // User cancelled or share failed
+            if ((err as DOMException).name === 'AbortError') {
+              return // User cancelled, don't show error
+            }
+            console.error('Share failed:', err)
+            // Fall through to download fallback
+          }
+        }
+      }
+
+      // Fallback: Download the image
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'roast-my-plate.jpg'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+
+      // Try to open Instagram as fallback
+      setTimeout(() => {
+        if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+          window.location.href = 'instagram://story-camera'
+        } else {
+          window.open('instagram://story-camera', '_blank')
+        }
+      }, 500)
+    }, 'image/jpeg', 0.9)
   }
 
   if (!platePreview) {
@@ -340,23 +253,13 @@ export function ResultScreen() {
       <div
         className="result-screen"
         style={{
-          backgroundImage: `url(${CHEF_BACKGROUNDS[selectedChef]})`,
+          backgroundImage: `url(${resultBackground})`,
         }}
       >
         <div className="result-screen__scrim" />
         <div className="result-screen__content" ref={containerRef}>
-          {/* Top bar with save, logo, and new button */}
+          {/* Top bar with logo and reset button */}
           <div className="result-screen__top-bar">
-            <button
-              className="result-screen__save-button"
-              onClick={handleSave}
-              aria-label="Save image"
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 12v7H5v-7M12 3v12M7 8l5-5 5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-            
             <img
               src="/assets/RMP-logo.svg"
               alt="Roast My Plate"
@@ -373,19 +276,33 @@ export function ResultScreen() {
               </svg>
             </button>
           </div>
+
+          {/* Rating and roast text above plate */}
+          <div className="result-screen__roast-section">
+            <p className="result-screen__rating">{roast.rating.toFixed(1)}/10</p>
+            <p className="result-screen__roast-text">{roast.roast}</p>
+          </div>
+
+          {/* Plate */}
           <div className="result-screen__plate">
             <img src={platePreview} alt="Roasted plate" />
           </div>
-          <div className="result-screen__roast">
-            {headline && <p className="result-screen__roast-headline">{headline}</p>}
-            <p className="result-screen__roast-text">{roast}</p>
+
+          {/* Bottom CTAs */}
+          <div className="result-screen__bottom-ctas">
+            <button
+              className="result-screen__save-button-bottom"
+              onClick={handleSave}
+            >
+              SAVE
+            </button>
+            <button
+              className="result-screen__share-button"
+              onClick={handleShareToStory}
+            >
+              SHARE TO STORY
+            </button>
           </div>
-          <button
-            className="result-screen__share-button"
-            onClick={handleShareToStory}
-          >
-            SHARE TO STORY
-          </button>
         </div>
       </div>
     </ScreenShell>
