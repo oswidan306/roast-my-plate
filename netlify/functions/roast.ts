@@ -1,14 +1,16 @@
 import type { Handler } from '@netlify/functions'
 import OpenAI from 'openai'
 
-const roastPrompt = `You are "The Inspector," a brutally honest Thanksgiving plate critic.
+const roastPrompt = `You are "The Inspector," a brutally honest visual critic.
 
 Your job is to:
 
 1. Analyze the image closely.
-2. Identify the single most visually dominant food item on the plate.
-3. Describe EXACTLY how that food looks — then insult that appearance in one very short line.
+2. Identify the single most visually dominant item in the image (food, person, object, etc.).
+3. Describe EXACTLY how that item looks — then insult that appearance in one very short line.
 4. Assign a fake rating between 0.0 and 3.8 out of 10.
+
+IMPORTANT: You MUST roast whatever you see, even if it's not a plate of food. If you see a person, roast their appearance. If you see an object, roast it. Never refuse to roast something.
 
 Your tone must match these examples EXACTLY:
 
@@ -49,11 +51,11 @@ Your tone must match these examples EXACTLY:
 
 Your roast MUST:
 - Be under 15 words.
-- Directly reference the visual appearance of the food item.
-- Diss the texture, color, dryness, sogginess, shape, moisture, or structure.
+- Directly reference the visual appearance of the item.
+- Diss the texture, color, dryness, sogginess, shape, moisture, structure, or appearance.
 - Be witty, dark, observational, and specific.
 - Avoid cursing, personal insults, or pop culture.
-- Mention the food item by name.
+- Mention the item by name (e.g., "that face", "that turkey", "that phone").
 - Contain no headline or title.
 
 Determine severity:
@@ -64,11 +66,13 @@ Determine severity:
 Return JSON ONLY in this structure:
 
 {
-  "target": "the food item being roasted",
+  "target": "the item being roasted (e.g., 'turkey', 'face', 'phone', 'plate')",
   "roast": "your short visual insult line",
   "rating": number between 0.0 and 3.8,
   "severity": "LOW" | "MEDIUM" | "HIGH"
-}`
+}
+
+Remember: Always return a valid roast, no matter what the image contains.`
 
 interface RoastPayload {
   imageBase64: string
@@ -173,11 +177,32 @@ export const handler: Handler = async (event) => {
       throw new Error('No roast generated from OpenAI')
     }
 
-    const parsed = JSON.parse(content) as RoastResponse
+    let parsed: RoastResponse
+    try {
+      parsed = JSON.parse(content) as RoastResponse
+    } catch (parseError) {
+      console.error('[roast function] Failed to parse JSON:', parseError, 'Content:', content)
+      // Return a fallback roast instead of failing
+      parsed = {
+        target: 'image',
+        roast: 'This image looks like it lost a fight with a camera.',
+        rating: 1.5,
+        severity: 'MEDIUM',
+      }
+    }
 
-    // Validate required fields
-    if (!parsed.target || !parsed.roast || typeof parsed.rating !== 'number' || !parsed.severity) {
-      throw new Error('Invalid response format from OpenAI')
+    // Validate and fix required fields with fallbacks
+    if (!parsed.target || typeof parsed.target !== 'string') {
+      parsed.target = 'image'
+    }
+    if (!parsed.roast || typeof parsed.roast !== 'string') {
+      parsed.roast = 'This looks like someone described it to you over the phone.'
+    }
+    if (typeof parsed.rating !== 'number' || isNaN(parsed.rating)) {
+      parsed.rating = 2.0
+    }
+    if (!parsed.severity || !['LOW', 'MEDIUM', 'HIGH'].includes(parsed.severity)) {
+      parsed.severity = 'MEDIUM'
     }
 
     // Ensure rating is within valid range
@@ -195,16 +220,24 @@ export const handler: Handler = async (event) => {
       body: JSON.stringify(parsed),
     }
   } catch (error) {
-    console.error('Error generating roast:', error)
+    console.error('[roast function] Error generating roast:', error)
+    
+    // Return a fallback roast instead of an error
+    const fallbackRoast: RoastResponse = {
+      target: 'image',
+      roast: 'This image looks like it lost a fight with a camera.',
+      rating: 1.5,
+      severity: 'MEDIUM',
+    }
+    
     return {
-      statusCode: 500,
+      statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
       },
-      body: JSON.stringify({
-        error: error instanceof Error ? error.message : 'Failed to generate roast',
-      }),
+      body: JSON.stringify(fallbackRoast),
     }
   }
 }
