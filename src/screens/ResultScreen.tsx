@@ -139,8 +139,8 @@ export function ResultScreen() {
 
       const plateSize = Math.min(420, window.innerWidth * 0.7)
       const plateX = window.innerWidth / 2 - plateSize / 2
-      // Position 40px above bottom CTAs (CTAs are 56px + padding)
-      const plateY = window.innerHeight - 56 - 40 - 40 - plateSize // 40px above CTAs, 40px padding
+      // Position 40px above bottom CTAs + 1rem down (CTAs are 56px + padding)
+      const plateY = window.innerHeight - 56 - 40 - 40 - 16 - plateSize // 40px above CTAs, 40px padding, 1rem (16px) down
 
       // Create circular clipping for plate
       ctx.save()

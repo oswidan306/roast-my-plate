@@ -917,7 +917,7 @@ img {
   border-radius: 50%;
   overflow: hidden;
   position: absolute;
-  bottom: calc(56px + 40px + 1.5rem); /* 40px above bottom CTAs (56px button + padding) */
+  bottom: calc(56px + 40px + 1.5rem + 1rem); /* 40px above bottom CTAs + 1rem down */
   left: 50%;
   transform: translateX(-50%);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -1160,6 +1160,10 @@ img {
 .camera-modal__error p {
   margin: 0;
   font-size: 1rem;
+}
+
+.camera-modal__file-input {
+  display: none;
 }
 
 @media (min-width: 768px) {

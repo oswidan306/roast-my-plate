@@ -56,10 +56,6 @@ export function CirclePlateUpload({
     onCameraStateChange?.(false)
   }
 
-  const handleChooseFile = () => {
-    inputRef.current?.click()
-  }
-
   return (
     <div className="plate-upload">
       <button
@@ -109,7 +105,6 @@ export function CirclePlateUpload({
         isOpen={showCamera}
         onClose={handleCameraClose}
         onCapture={handleCameraCapture}
-        onChooseFile={handleChooseFile}
         guideSize={420}
       />
     </div>

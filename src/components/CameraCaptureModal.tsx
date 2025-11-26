@@ -1,24 +1,29 @@
+import type { ChangeEvent } from 'react'
 import { useEffect, useRef, useState } from 'react'
 
 interface CameraCaptureModalProps {
   isOpen: boolean
   onClose: () => void
   onCapture: (file: File, previewUrl: string) => void
-  onChooseFile?: () => void
   guideSize?: number // Size of the circular guide in pixels
 }
+
+const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/heic', 'image/heif']
 
 export function CameraCaptureModal({
   isOpen,
   onClose,
   onCapture,
-  onChooseFile,
   guideSize = 280,
 }: CameraCaptureModalProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isCapturing, setIsCapturing] = useState(false)
+  
+  // Calculate responsive guide size - ensure it fits on screen with padding
+  const responsiveGuideSize = Math.min(guideSize, (window.innerWidth - 40) * 0.85)
 
   useEffect(() => {
     if (!isOpen) return
@@ -95,7 +100,7 @@ export function CameraCaptureModal({
 
     // Calculate guide position in video coordinates
     // Guide is centered on screen, so center of displayed video area
-    const guideRadiusPx = guideSize / 2
+    const guideRadiusPx = responsiveGuideSize / 2
     const scaleX = sourceWidth / displayWidth
     const guideRadiusVideo = guideRadiusPx * scaleX
 
@@ -161,17 +166,28 @@ export function CameraCaptureModal({
   }
 
   const handleChooseFile = () => {
+    // Trigger file input directly without closing modal
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    if (!ACCEPTED_TYPES.includes(file.type)) {
+      alert('Please upload a JPG, PNG, or HEIC image.')
+      return
+    }
+
+    // Stop camera
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop())
       streamRef.current = null
     }
+
+    const previewUrl = URL.createObjectURL(file)
+    onCapture(file, previewUrl)
     onClose()
-    // Trigger file picker if callback provided
-    if (onChooseFile) {
-      setTimeout(() => {
-        onChooseFile()
-      }, 100)
-    }
   }
 
   if (!isOpen) return null
@@ -193,11 +209,20 @@ export function CameraCaptureModal({
           <div
             className="camera-modal__guide-circle"
             style={{
-              width: `${guideSize}px`,
-              height: `${guideSize}px`,
+              width: `${responsiveGuideSize}px`,
+              height: `${responsiveGuideSize}px`,
             }}
           />
         </div>
+
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={ACCEPTED_TYPES.join(',')}
+          className="camera-modal__file-input"
+          onChange={handleFileChange}
+        />
 
         {/* Error message */}
         {error && (
