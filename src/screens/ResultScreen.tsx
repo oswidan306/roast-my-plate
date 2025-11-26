@@ -164,6 +164,9 @@ export function ResultScreen() {
   }
 
   const handleSave = async () => {
+    // If already saved, don't do anything
+    if (isSaved) return
+
     const canvas = await createShareImage(false)
     if (!canvas) {
       alert('Unable to save image. Please try again.')
@@ -173,33 +176,28 @@ export function ResultScreen() {
     canvas.toBlob(async (blob) => {
       if (!blob) return
 
-      // Try to save to photos using Web Share API or download
+      // Try to save to photos using Web Share API
       if (navigator.share && navigator.canShare) {
         const file = new File([blob], 'roast-my-plate.jpg', { type: 'image/jpeg' })
         if (navigator.canShare({ files: [file] })) {
           try {
             await navigator.share({ files: [file] })
             setIsSaved(true)
-            setTimeout(() => setIsSaved(false), 2000)
             return
           } catch (err) {
-            // Fall through to download
+            // User cancelled or dismissed - don't do anything
+            if ((err as DOMException).name === 'AbortError') {
+              return
+            }
+            // If share failed for other reason, mark as saved anyway
+            setIsSaved(true)
+            return
           }
         }
       }
 
-      // Fallback: Download (will save to Photos on mobile)
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = 'roast-my-plate.jpg'
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
-      
+      // If Web Share API not available, mark as saved (user can use share to story)
       setIsSaved(true)
-      setTimeout(() => setIsSaved(false), 2000)
     }, 'image/jpeg', 0.9)
   }
 
@@ -218,36 +216,40 @@ export function ResultScreen() {
     canvas.toBlob(async (blob) => {
       if (!blob) return
 
-      // Save image first, then open Instagram
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = 'roast-my-plate.jpg'
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
-
-      // Open Instagram Stories directly
-      setTimeout(() => {
-        // Try Instagram deep link for stories
-        const instagramUrl = 'instagram://story-camera'
-        
-        // For iOS
-        if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-          window.location.href = instagramUrl
-          // Fallback to web if app doesn't open
-          setTimeout(() => {
-            window.location.href = 'https://www.instagram.com/'
-          }, 1000)
-        } else {
-          // For Android
-          window.location.href = instagramUrl
-          setTimeout(() => {
-            window.open('https://www.instagram.com/', '_blank')
-          }, 1000)
+      // Try Web Share API first
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], 'roast-my-plate.jpg', { type: 'image/jpeg' })
+        if (navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({ files: [file] })
+            return
+          } catch (err) {
+            // User cancelled - don't do anything
+            if ((err as DOMException).name === 'AbortError') {
+              return
+            }
+            // Fall through to Instagram deep link
+          }
         }
-      }, 300)
+      }
+
+      // Open Instagram Stories directly (no download)
+      const instagramUrl = 'instagram://story-camera'
+      
+      // For iOS
+      if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        window.location.href = instagramUrl
+        // Fallback to web if app doesn't open
+        setTimeout(() => {
+          window.location.href = 'https://www.instagram.com/'
+        }, 1000)
+      } else {
+        // For Android
+        window.location.href = instagramUrl
+        setTimeout(() => {
+          window.open('https://www.instagram.com/', '_blank')
+        }, 1000)
+      }
     }, 'image/jpeg', 0.9)
   }
 
@@ -274,13 +276,11 @@ export function ResultScreen() {
             />
 
             <button
-              className="result-screen__replace-button"
+              className="result-screen__new-button"
               onClick={handleReplacePlate}
-              aria-label="Reset"
+              aria-label="New"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              NEW
             </button>
           </div>
 
@@ -298,7 +298,7 @@ export function ResultScreen() {
           {/* Bottom CTAs */}
           <div className="result-screen__bottom-ctas">
             <button
-              className="result-screen__save-button-bottom"
+              className={`result-screen__save-button-bottom ${isSaved ? 'result-screen__save-button-bottom--saved' : ''}`}
               onClick={handleSave}
             >
               {isSaved ? 'SAVED' : 'SAVE'}

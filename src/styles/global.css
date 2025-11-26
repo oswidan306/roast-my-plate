@@ -209,6 +209,8 @@ img {
   transform: translate(-50%, -50%);
   z-index: 0;
   object-fit: cover;
+  background: #1a1a1a; /* Dark background while loading */
+  display: block; /* Ensure it renders immediately */
 }
 
 .screen-shell--dark {
@@ -461,10 +463,7 @@ img {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem; /* Space between title and chef review */
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem; /* Space between title and chef review */
+  gap: 0.5rem; /* Decreased spacing between title and chef review */
 }
 
 .upload-screen__header--slide-up {
@@ -474,7 +473,7 @@ img {
 .upload-screen__header-text {
   margin: 0;
   font-family: 'PP Editorial New', serif;
-  font-size: 5.125rem; /* 82px */
+  font-size: clamp(3rem, 8vw, 5.125rem); /* Responsive: 48px to 82px */
   font-weight: 200;
   text-transform: uppercase;
   letter-spacing: 0; /* Decreased from 0.05em (4%) to 0 */
@@ -534,13 +533,14 @@ img {
 
 .upload-screen__chef-review {
   font-family: 'PP Editorial New', serif;
-  font-size: 1.25rem; /* Increased from 1rem */
+  font-size: clamp(0.875rem, 2.5vw, 1.25rem); /* Responsive: 14px to 20px */
   font-weight: 200;
   color: rgba(255, 255, 255, 0.9);
   text-transform: uppercase;
   letter-spacing: 0.15em;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   margin: 0;
+  margin-top: -0.25rem; /* Move up slightly */
   text-align: center;
   white-space: nowrap; /* Keep on one line */
 }
@@ -847,14 +847,13 @@ img {
   pointer-events: none;
 }
 
-.result-screen__replace-button {
-  width: 48px;
-  height: 48px;
+.result-screen__new-button {
+  height: 56px;
+  padding: 0 1.5rem;
   border: none;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(10px);
-  color: #fff;
+  border-radius: 0;
+  background: #fff;
+  color: #000;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -863,15 +862,22 @@ img {
   flex-shrink: 0;
   position: relative;
   z-index: 2;
+  font-size: 1.25rem;
+  font-weight: 200;
+  font-family: 'PP Editorial New', serif;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.result-screen__replace-button:hover {
-  background: rgba(0, 0, 0, 0.7);
-  transform: scale(1.1);
+.result-screen__new-button:hover {
+  background: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
-.result-screen__replace-button:active {
-  transform: scale(0.95);
+.result-screen__new-button:active {
+  transform: translateY(0);
 }
 
 .result-screen__roast-section {
@@ -952,18 +958,23 @@ img {
   letter-spacing: 0;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background 150ms ease, transform 150ms ease;
+  transition: background 150ms ease, transform 150ms ease, opacity 150ms ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.result-screen__save-button-bottom:hover {
+.result-screen__save-button-bottom:hover:not(.result-screen__save-button-bottom--saved) {
   background: #f0f0f0;
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
-.result-screen__save-button-bottom:active {
+.result-screen__save-button-bottom:active:not(.result-screen__save-button-bottom--saved) {
   transform: translateY(0);
+}
+
+.result-screen__save-button-bottom--saved {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .result-screen__share-button {

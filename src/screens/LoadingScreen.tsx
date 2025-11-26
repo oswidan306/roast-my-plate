@@ -91,6 +91,7 @@ export function LoadingScreen() {
         loop
         muted
         playsInline
+        preload="auto"
       >
         <source src="/assets/loading.mp4" type="video/mp4" />
       </video>

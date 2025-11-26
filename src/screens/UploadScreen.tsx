@@ -24,7 +24,7 @@ export function UploadScreen() {
       <div className="upload-screen">
         <div className={`upload-screen__header ${isAnimating ? 'upload-screen__header--slide-up' : ''}`}>
           <p className="upload-screen__header-text">
-            <span className="upload-screen__header-word--submit">SUBMIT</span>{' '}
+            <span className="upload-screen__header-word--submit">UPLOAD</span>{' '}
             <span className="upload-screen__header-word--dish">DISH</span>
           </p>
           <p className="upload-screen__chef-review">** FOR CHEF'S REVIEW **</p>
