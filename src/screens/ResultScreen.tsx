@@ -20,7 +20,12 @@ export function ResultScreen() {
 
   const safeRoast =
     roastText ||
-    'Placeholder roast: The stuffing looks like a beige asteroid field and that turkey slice needs CPR.'
+    'PLACEHOLDER\n\nThis turkey died twice.'
+  
+  // Format roast: split headline and roast if they exist
+  const roastParts = safeRoast.split('\n\n')
+  const headline = roastParts[0] || ''
+  const roast = roastParts[1] || safeRoast
 
   useEffect(() => {
     if (!platePreview) {
@@ -340,37 +345,41 @@ export function ResultScreen() {
       >
         <div className="result-screen__scrim" />
         <div className="result-screen__content" ref={containerRef}>
-          {/* Top left save button */}
-          <button
-            className="result-screen__save-button"
-            onClick={handleSave}
-            aria-label="Save image"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M19 12v7H5v-7M12 3v12M7 8l5-5 5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-          
-          {/* Top right reset button */}
-          <button
-            className="result-screen__replace-button"
-            onClick={handleReplacePlate}
-            aria-label="Reset"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
+          {/* Top bar with save, logo, and new button */}
+          <div className="result-screen__top-bar">
+            <button
+              className="result-screen__save-button"
+              onClick={handleSave}
+              aria-label="Save image"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 12v7H5v-7M12 3v12M7 8l5-5 5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+            
+            <img
+              src="/assets/RMP-logo.svg"
+              alt="Roast My Plate"
+              className="result-screen__logo"
+            />
 
-          <img
-            src="/assets/RMP-logo.svg"
-            alt="Roast My Plate"
-            className="result-screen__logo"
-          />
+            <button
+              className="result-screen__replace-button"
+              onClick={handleReplacePlate}
+              aria-label="Reset"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
           <div className="result-screen__plate">
             <img src={platePreview} alt="Roasted plate" />
           </div>
-          <p className="result-screen__roast">{safeRoast.toUpperCase()}</p>
+          <div className="result-screen__roast">
+            {headline && <p className="result-screen__roast-headline">{headline}</p>}
+            <p className="result-screen__roast-text">{roast}</p>
+          </div>
           <button
             className="result-screen__share-button"
             onClick={handleShareToStory}

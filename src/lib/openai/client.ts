@@ -2,7 +2,10 @@ import OpenAI from 'openai'
 import { roastPrompt, defaultModel } from './prompt'
 
 export interface RoastResponse {
+  headline: string
+  target: string
   roast: string
+  severity: 'LOW' | 'MEDIUM' | 'HIGH'
 }
 
 export interface RoastPayload {
@@ -66,17 +69,30 @@ export async function requestRoast(payload: RoastPayload): Promise<RoastResponse
           ],
         },
       ],
-      max_tokens: 150,
-      temperature: 0.9, // Higher temperature for more creative/comedic roasts
+      max_tokens: 200,
+      temperature: 0.7, // Lower temperature for more consistent, deadpan tone
+      response_format: { type: 'json_object' },
     })
 
-    const roast = response.choices[0]?.message?.content?.trim()
+    const content = response.choices[0]?.message?.content?.trim()
 
-    if (!roast) {
+    if (!content) {
       throw new Error('No roast generated from OpenAI')
     }
 
-    return { roast }
+    try {
+      const parsed = JSON.parse(content) as RoastResponse
+      
+      // Validate required fields
+      if (!parsed.headline || !parsed.target || !parsed.roast || !parsed.severity) {
+        throw new Error('Invalid response format from OpenAI')
+      }
+
+      return parsed
+    } catch (parseError) {
+      console.error('[roast] Failed to parse JSON response:', parseError)
+      throw new Error('Invalid response format from OpenAI')
+    }
   } catch (error) {
     console.error('[roast] OpenAI API error:', error)
     if (error instanceof OpenAI.APIError) {

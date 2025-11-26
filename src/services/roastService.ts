@@ -1,4 +1,4 @@
-import { requestRoast, fileToBase64, type RoastPayload } from '../lib/openai/client'
+import { requestRoast, fileToBase64, type RoastPayload, type RoastResponse } from '../lib/openai/client'
 
 /**
  * Generates a roast for a plate image using OpenAI Vision API
@@ -15,8 +15,10 @@ export async function generateRoast(file: File): Promise<string> {
       mimeType,
     }
 
-    const response = await requestRoast(payload)
-    return response.roast
+    const response: RoastResponse = await requestRoast(payload)
+    
+    // Format the response as: "HEADLINE\n\nroast sentence"
+    return `${response.headline}\n\n${response.roast}`
   } catch (error) {
     console.error('Error generating roast:', error)
     
