@@ -80,24 +80,66 @@ export function ResultScreen() {
 
       // Draw dark scrim (darker towards bottom)
       const gradient = ctx.createLinearGradient(0, 0, 0, window.innerHeight)
-      gradient.addColorStop(0, 'rgba(0, 0, 0, 0.2)')
-      gradient.addColorStop(0.5, 'rgba(0, 0, 0, 0.4)')
+      gradient.addColorStop(0, 'rgba(0, 0, 0, 0.1)')
+      gradient.addColorStop(0.5, 'rgba(0, 0, 0, 0.3)')
       gradient.addColorStop(1, 'rgba(0, 0, 0, 0.7)')
       ctx.fillStyle = gradient
       ctx.fillRect(0, 0, window.innerWidth, window.innerHeight)
 
-      // Draw rating and roast text above plate
+      // Draw logo centered horizontally and vertically in upper portion
+      const logoImg = new Image()
+      logoImg.crossOrigin = 'anonymous'
+      logoImg.src = '/assets/RMP-logo.svg'
+      await new Promise((resolve, reject) => {
+        logoImg.onload = resolve
+        logoImg.onerror = reject
+      })
+
+      const logoWidth = 200
+      const logoHeight = (logoImg.height / logoImg.width) * logoWidth
+      const logoX = window.innerWidth / 2 - logoWidth / 2 // Centered horizontally
+      // Position logo at 10% from top, centered vertically
+      const logoY = window.innerHeight * 0.1 - logoHeight / 2 // 10% from top, centered vertically
+      ctx.drawImage(logoImg, logoX, logoY, logoWidth, logoHeight)
+
+      // Draw rating and roast text centered horizontally, at original higher positions
       ctx.fillStyle = '#fff'
-      ctx.textAlign = 'left'
+      ctx.textAlign = 'center'
       ctx.textBaseline = 'top'
       
-      // Rating (large, red number)
-      const ratingText = `${roast.rating.toFixed(1)}/10`
+      // Calculate center position for horizontal centering
+      const centerX = window.innerWidth / 2
+      
+      // Rating (number in red, "/10" in white ultralight)
+      const ratingNumber = roast.rating.toFixed(1)
+      const ratingSuffix = '/10'
+      ctx.font = 'bold 48px "PP Editorial New", serif'
+      const ratingY = window.innerHeight * 0.25 // Position rating at 25% from top (pushed lower to avoid logo)
+      
+      // Measure both parts to calculate centered position
+      ctx.textAlign = 'left' // Temporarily use left align for precise positioning
+      const numberMetrics = ctx.measureText(ratingNumber)
+      
+      // Measure "/10" with ultralight font
+      ctx.font = '200 48px "PP Editorial New", serif'
+      const suffixMetrics = ctx.measureText(ratingSuffix)
+      const totalWidth = numberMetrics.width + suffixMetrics.width
+      
+      // Calculate starting position to center the entire rating
+      const startX = centerX - totalWidth / 2
+      
+      // Draw number in red with bold font
       ctx.font = 'bold 48px "PP Editorial New", serif'
       ctx.fillStyle = '#dc2626'
-      const ratingX = window.innerWidth * 0.1 // Left side
-      const ratingY = window.innerHeight * 0.15 // Above plate
-      ctx.fillText(ratingText, ratingX, ratingY)
+      ctx.fillText(ratingNumber, startX, ratingY)
+      
+      // Draw "/10" in white with ultralight font, right after the number
+      ctx.font = '200 48px "PP Editorial New", serif'
+      ctx.fillStyle = '#fff'
+      ctx.fillText(ratingSuffix, startX + numberMetrics.width, ratingY)
+      
+      // Reset text alignment for roast text
+      ctx.textAlign = 'center'
 
       // Roast text (white, below rating)
       ctx.font = '200 24px "PP Editorial New", serif'
@@ -107,9 +149,8 @@ export function ResultScreen() {
       ctx.shadowOffsetX = 0
       ctx.shadowOffsetY = 2
       
-      const roastX = ratingX
-      const roastY = ratingY + 60
-      const maxWidth = window.innerWidth - roastX * 2
+      const roastY = window.innerHeight * 0.25 + 60 // Position roast below rating (pushed lower to avoid logo)
+      const maxWidth = window.innerWidth * 0.8 // 80% of width for text wrapping
       const lineHeight = 32
       const words = roast.roast.split(' ')
       let line = ''
@@ -119,7 +160,7 @@ export function ResultScreen() {
         const testLine = line + words[i] + ' '
         const metrics = ctx.measureText(testLine)
         if (metrics.width > maxWidth && i > 0) {
-          ctx.fillText(line.trim(), roastX, y)
+          ctx.fillText(line.trim(), centerX, y)
           line = words[i] + ' '
           y += lineHeight
         } else {
@@ -127,7 +168,7 @@ export function ResultScreen() {
         }
       }
       if (line.trim()) {
-        ctx.fillText(line.trim(), roastX, y)
+        ctx.fillText(line.trim(), centerX, y)
       }
 
       // Reset shadow
@@ -272,7 +313,10 @@ export function ResultScreen() {
 
           {/* Rating and roast text above plate */}
           <div className="result-screen__roast-section">
-            <p className="result-screen__rating">{roast.rating.toFixed(1)}/10</p>
+            <p className="result-screen__rating">
+              <span style={{ color: '#dc2626' }}>{roast.rating.toFixed(1)}</span>
+              <span style={{ color: '#fff', fontWeight: 200 }}>/10</span>
+            </p>
             <p className="result-screen__roast-text">{roast.roast}</p>
           </div>
 

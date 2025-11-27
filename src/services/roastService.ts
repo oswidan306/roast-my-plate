@@ -1,4 +1,31 @@
 /**
+ * Compresses and downscales an image file
+ * Scales the image so its longest side is no more than 1000px
+ * Converts to JPEG at quality 0.7
+ */
+export async function compressImage(file: File): Promise<File> {
+  const bmp = await createImageBitmap(file)
+  const canvas = document.createElement('canvas')
+
+  const MAX = 1000
+  const scale = Math.min(MAX / bmp.width, MAX / bmp.height, 1)
+
+  canvas.width = bmp.width * scale
+  canvas.height = bmp.height * scale
+
+  const ctx = canvas.getContext('2d')!
+  ctx.drawImage(bmp, 0, 0, canvas.width, canvas.height)
+
+  return await new Promise(resolve => {
+    canvas.toBlob(
+      blob => resolve(new File([blob!], file.name, { type: 'image/jpeg' })),
+      'image/jpeg',
+      0.7
+    )
+  })
+}
+
+/**
  * Converts a File to base64 string
  */
 async function fileToBase64(file: File): Promise<string> {
@@ -27,9 +54,30 @@ export interface RoastResponse {
  */
 export async function generateRoast(file: File): Promise<RoastResponse> {
   try {
-    // Convert file to base64
-    const imageBase64 = await fileToBase64(file)
-    const mimeType = file.type || 'image/jpeg'
+    // Bypass API call for localhost testing
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    
+    if (isLocalhost) {
+      console.log('[roast] Localhost detected - bypassing API call with mock response')
+      
+      // Return mock response after a short delay to simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      const mockResponse: RoastResponse = {
+        target: 'turkey',
+        roast: 'This turkey died twice.',
+        rating: 1.8,
+        severity: 'HIGH',
+      }
+      
+      console.log('[roast] Mock response:', mockResponse)
+      return mockResponse
+    }
+
+    // Compress and downscale image before converting to base64
+    const compressedFile = await compressImage(file)
+    const imageBase64 = await fileToBase64(compressedFile)
+    const mimeType = 'image/jpeg' // Always JPEG after compression
 
     // Determine the function URL - use full URL in production, relative in dev
     const functionUrl = import.meta.env.PROD
