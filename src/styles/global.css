@@ -925,6 +925,13 @@ img {
   z-index: 3;
 }
 
+/* Adjust plate position for smaller screens (e.g., iPhone 14) */
+@media (max-height: 900px) {
+  .result-screen__plate {
+    bottom: calc(56px + 20px + 1.5rem + 1rem); /* Reduced gap from 40px to 20px */
+  }
+}
+
 .result-screen__plate img {
   width: 100%;
   height: 100%;
