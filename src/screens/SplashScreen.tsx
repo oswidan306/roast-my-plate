@@ -1,8 +1,15 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ScreenShell } from '../components/ScreenShell'
+import { trackPageView } from '../lib/analytics'
 
 export function SplashScreen() {
   const navigate = useNavigate()
+
+  // Track page view
+  useEffect(() => {
+    trackPageView('/', 'Splash Screen')
+  }, [])
 
   return (
     <ScreenShell id="splash" background="splash" padded={false}>

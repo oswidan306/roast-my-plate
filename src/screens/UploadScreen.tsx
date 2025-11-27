@@ -1,14 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useRoastSession } from '../context/RoastSessionContext'
 import { ScreenShell } from '../components/ScreenShell'
 import { CirclePlateUpload } from '../components/CirclePlateUpload'
+import { trackPageView } from '../lib/analytics'
 
 export function UploadScreen() {
   const navigate = useNavigate()
   const { platePreview, selectPlate, startProcessing } = useRoastSession()
   const [isAnimating, setIsAnimating] = useState(false)
   const [isCameraOpen, setIsCameraOpen] = useState(false)
+
+  // Track page view
+  useEffect(() => {
+    trackPageView('/upload', 'Upload Screen')
+  }, [])
 
   const handleRoast = () => {
     setIsAnimating(true)

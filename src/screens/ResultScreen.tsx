@@ -2,6 +2,7 @@ import { useEffect, useRef, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ScreenShell } from '../components/ScreenShell'
 import { useRoastSession } from '../context/RoastSessionContext'
+import { trackEvent, trackPageView } from '../lib/analytics'
 
 const RESULT_BACKGROUNDS = {
   LOW: '/assets/result-1.png',
@@ -27,6 +28,13 @@ export function ResultScreen() {
   const resultBackground = useMemo(() => {
     return RESULT_BACKGROUNDS[roast.severity] || RESULT_BACKGROUNDS.MEDIUM
   }, [roast.severity])
+
+  // Track page view
+  useEffect(() => {
+    if (platePreview && phase === 'complete') {
+      trackPageView('/result', 'Result Screen')
+    }
+  }, [platePreview, phase])
 
   useEffect(() => {
     if (!platePreview) {
@@ -156,7 +164,7 @@ export function ResultScreen() {
         ctx.font = '200 16px "PP Editorial New", serif'
         ctx.textAlign = 'center'
         ctx.textBaseline = 'bottom'
-        ctx.fillText('ROASTMYPLATE.APP', window.innerWidth / 2, window.innerHeight - 20)
+        ctx.fillText('ROASTMYPLATE.APP', window.innerWidth / 2, window.innerHeight - 40)
       }
 
       return canvas
@@ -172,6 +180,9 @@ export function ResultScreen() {
   }
 
   const handleShare = async () => {
+    // Track share attempt
+    trackEvent('share_attempt')
+
     const canvas = await createShareImage(true)
     if (!canvas) {
       alert('Unable to create share image. Please try again.')
@@ -188,6 +199,10 @@ export function ResultScreen() {
         if (navigator.canShare({ files: [file] })) {
           try {
             await navigator.share({ files: [file] })
+            // Track successful share
+            trackEvent('share_success', {
+              method: 'web_share_api',
+            })
             return
           } catch (err) {
             // User cancelled - don't do anything
@@ -201,6 +216,11 @@ export function ResultScreen() {
 
       // Fallback: Open Instagram Stories directly
       const instagramUrl = 'instagram://story-camera'
+      
+      // Track share success for Instagram deep link
+      trackEvent('share_success', {
+        method: 'instagram_deep_link',
+      })
       
       // For iOS
       if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {

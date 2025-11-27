@@ -4,6 +4,7 @@ import { ScreenShell } from '../components/ScreenShell'
 import { PrimaryButton } from '../components/PrimaryButton'
 import { useRoastSession } from '../context/RoastSessionContext'
 import { generateRoast } from '../services/roastService'
+import { trackEvent, trackPageView } from '../lib/analytics'
 
 export function LoadingScreen() {
   const navigate = useNavigate()
@@ -16,6 +17,11 @@ export function LoadingScreen() {
     resetSession,
   } = useRoastSession()
   const [progress, setProgress] = useState(0)
+
+  // Track page view
+  useEffect(() => {
+    trackPageView('/loading', 'Loading Screen')
+  }, [])
 
   useEffect(() => {
     if (!platePreview) {
@@ -56,15 +62,25 @@ export function LoadingScreen() {
           // Small delay to show 100%
           setTimeout(() => {
             completeRoast(roastData)
+            // Track successful roast generation
+            trackEvent('roast_generated', {
+              rating: roastData.rating,
+              severity: roastData.severity,
+            })
             navigate('/result', { replace: true })
           }, 200)
         } catch (error) {
           console.error('Error generating roast:', error)
-          failRoast(
-            error instanceof Error
-              ? error.message
-              : 'Failed to generate roast. Please try again.'
-          )
+          const errorMessage = error instanceof Error
+            ? error.message
+            : 'Failed to generate roast. Please try again.'
+          
+          // Track roast error
+          trackEvent('roast_error', {
+            error_message: errorMessage,
+          })
+          
+          failRoast(errorMessage)
         }
       }
 
