@@ -76,9 +76,9 @@ export function initAnalytics(measurementId: string): void {
 
   // Define gtag function
   function gtag(
-    command: 'config' | 'event' | 'set' | 'js',
-    targetId: string | Date,
-    config?: Record<string, unknown>
+    _command: 'config' | 'event' | 'set' | 'js',
+    _targetId: string | Date,
+    _config?: Record<string, unknown>
   ): void {
     window.dataLayer!.push(arguments)
   }
